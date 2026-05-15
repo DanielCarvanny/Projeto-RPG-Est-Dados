@@ -689,6 +689,144 @@ void accusationMenu(){ //Cena de acusação
   }
 }
 
+//---------------[Criações]---------------
+void creatClues(TabelaHash &table){
+  //----------[Pista 1]----------
+  Clue knife;
+  knife.idClue = 1;
+  knife.title = "Faca";
+  knife.description = "A lâmina ainda possui sangue. Porém, quase não existem impressões digitais. Pequenas marcas de tecido podem ser vistas próximas ao cabo.";
+  
+  knife.question = "O que a ausencia parcial de digitais indica?";
+  knife.options[0] = "A arma foi trocada";
+  knife.options[1] = "O assassino tentou limpar a faca";
+  knife.options[2] = "A vitima segurou a faca";
+  knife.options[3] = "O sangue foi plantado";
+
+  knife.correctReponse = 2;
+  knife.realClue = true;
+  table.input("P1", knife);
+  
+  
+  
+  //----------[Pista 2]----------
+  Clue positionKnife;
+  positionKnife.idClue = 2;
+  positionKnife.title = "Posicao da Faca";
+  positionKnife.description = "O golpe entrou em um ângulo incomum...a perfuração veio de baixo para cima. A vítima aparentemente estava em pé.";
+  positionKnife.question = "O que voce conclui sobre quem realizou esse golpe?";
+  
+  positionKnife.options[0] = "O assassino era mais alto";
+  positionKnife.options[1] = "O assassino atacou a distancia";
+  positionKnife.options[2] = "O assassino era mais baixo";
+  positionKnife.options[3] = "Existiam dois assassinos";
+
+  positionKnife.correctReponse = 3;
+  positionKnife.realClue = true;
+  table.input("P2", positionKnife);
+  
+  
+ 
+  //----------[Pista 3]----------
+  Clue knifeHandle;
+  knifeHandle.idClue = 3;
+  knifeHandle.title = "Cabo com microfissuras";
+  knifeHandle.description = "A forca aplicada na faca indica uma adrenalina alta, a pessoa estava em extrema tensao.";
+  knifeHandle.question = "Que tipo de estado emocional o assassino demonstrava?";
+  knifeHandle.options[0] = "Raiva";
+  knifeHandle.options[1] = "Ansiedade";
+  knifeHandle.options[2] = "Nervosismo";
+  knifeHandle.options[3] = "Medo";
+
+  knifeHandle.correctReponse = 3;
+  knifeHandle.realClue = true;
+  table.input("P3", knifeHandle);
+  
+  
+  
+  //----------[Pista Falsa 1]----------
+  Clue tissue;
+  tissue.idClue = 4;
+  tissue.title = "Lenço da esposa";
+  tissue.description = "Uma espécie de lenço feminino, manchado de sangue, encontrado proximo ao corpo. Voce sente um cheiro de perfume quando aproxima ele em seu rosto.";
+  tissue.question = "A quem esse lenço pertence?";
+  
+  tissue.options[0] = "Violet";
+  tissue.options[1] = "Eleanor";
+  tissue.options[2] = "A empregada";
+  tissue.options[3] = "Uma visitante";
+
+  tissue.correctReponse = 2;
+  table.input("P4", tissue);
+  
+  
+  
+  //----------[Pista Falsa 2]----------
+  Clue cigarette;
+  cigarette.idClue = 5;
+  cigarette.title = "Cigarros do Mordomo";
+  cigarette.description = "Cinzas de cigarro foram encontradas próximas à entrada da cozinha. A bituca de cigarro ainda esta morna";
+  cigarette.question = "Quem possui o hábito de fumar?";
+  
+  cigarette.options[0] = "Arthur";
+  cigarette.options[1] = "Edward";
+  cigarette.options[2] = "Alfred";
+  cigarette.options[3] = "William Carter";
+
+  cigarette.correctReponse = 3;
+  table.input("P5", cigarette);
+ 
+ 
+ 
+  //----------[Pista Falsa 3]----------
+  Clue discussion;
+  discussion.idClue = 6;
+  discussion.title = "Discussão recente do filho mais velho";
+  discussion.description = "Empregados relataram uma discussão intensa horas antes do assassinato. O assunto envolvia herança e controle da empresa da família.";
+  discussion.question = "Quem discutiu com a vítima?";
+  
+  discussion.options[0] = "Eleanor";
+  discussion.options[1] = "Alfred";
+  discussion.options[2] = "Edward";
+  discussion.options[3] = "Arthur";
+
+  discussion.correctReponse = 4;
+  table.input("P6", discussion);
+ 
+ 
+ 
+  //----------[Pista Falsa 4]----------
+  Clue medication;
+  medication.idClue = 7;
+  medication.title = "Remédio antdepressivo";
+  medication.description = "Um remedio antidepressivo foi encontrado no lixo. Mas o nome do paciente estava parcialmente rasgado";
+  medication.question = "Qual suspeito demonstra uma instabilidade emocional?";
+  
+  medication.options[0] = "Arthur";
+  medication.options[1] = "Violet";
+  medication.options[2] = "Edward";
+  medication.options[3] = "Alfred";
+
+  medication.correctReponse = 3;
+  table.input("P7", medication);
+}
+void createConnectionsClue(Grafo &graph){
+  graph.addNo("P1", 1);
+  graph.addNo("P2", 1);
+  graph.addNo("P3", 1);
+
+  graph.addNo("P4", 2);
+  graph.addNo("P5", 2);
+  graph.addNo("P6", 2);
+  graph.addNo("P7", 2);
+
+  //Conexões entre pistas que existem
+  graph.addConnections(0,1);
+  graph.addConnections(1,2);
+
+  //Conexões falsas
+  graph.addConnections(4,6);
+}
 
 
 
