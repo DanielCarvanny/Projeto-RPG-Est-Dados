@@ -302,6 +302,46 @@ void showDeduction(Grafo &graph, string clueKey){
     }
 }
 
+//---------------[História]---------------
+void introStory(){
+  cout << "===== INVESTIGACAO POLICIAL =====" << endl;
+  next();
+
+  cout << "Londres -- 15 de Janeiro de 2010, 22:20" << endl;
+  next();
+
+  cout << "A chuva fina castigava as ruas de Londres..." << endl;
+  next();
+
+  cout << "Dentro de um taxi escuro..." << endl;
+  next();
+
+  cout << "O veiculo desacelera." << endl;
+  next();
+
+  cout << "A frente, uma enorme residencia vitoriana..." << endl;
+  next();
+}
+void crimeScene(){
+  cout << endl << "=== CENA DO CRIME -- COZINHA ===" << endl;
+  next();
+
+  cout << "Ao entrarem, o cheiro-metalico do sangue..." << endl;
+  next();
+
+  cout << "A cozinha luxuosa parece congelada no tempo." << endl;
+  next();
+
+  cout << "No centro da cozinha..." << endl;
+  next();
+
+  cout << "o corpo." << endl;
+  next();
+}
+
+
+
+
 
 int main() {
   TabelaHash table;
