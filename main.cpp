@@ -4,17 +4,32 @@ using namespace std;
 
 const int MAX_VERTICES = 5;
 
+//---------------[Struct]---------------
 struct Clue { //Estrutura da Pista
   int idClue;
+  
+  string title;
   string description;
   string question;
-  string correctReponse;
-  bool resolvida;
-  bool descoberta;
+  string options[4];
+  int correctReponse;
+  
+  bool resolvida = false;
+  bool descoberta = false;
+  bool realClue = false;
 };
 
-class TabelaHash {
-private:
+//---------------[Auxiliar]---------------
+void next(){ //Função pra pausa
+
+    string continuar;
+    getline(cin, continuar);
+}
+
+
+//---------------[Classes]---------------
+class TabelaHash{
+  private:
     static const int MAX = 10;
 
     struct No{ //Estrutura de entrada
@@ -40,12 +55,12 @@ private:
       return sum % MAX;
     }
 
-public:
-  TabelaHash() {
-    for (int i = 0; i < MAX; i++) {
-      tableHash[i] = NULL;
+  public:
+    TabelaHash() {
+      for (int i = 0; i < MAX; i++) {
+        tableHash[i] = NULL;
+      }
     }
-  }
 
     void input(string key, Clue value) {
       int position = funcaoHash(key);
@@ -100,15 +115,14 @@ public:
       }
     }
 };
-
 class Grafo{
-    public:
-        Grafo(){
-            numVertices = 0;                          
-            for(int i = 0; i < MAX_VERTICES; i++){
-                vertices[i] = NULL;
-            }
-        }
+  public:
+      Grafo(){
+          numVertices = 0;                          
+          for(int i = 0; i < MAX_VERTICES; i++){
+              vertices[i] = NULL;
+          }
+      }
   private:           
     struct No{
       string idClue;
@@ -152,7 +166,7 @@ class Grafo{
       }
     }
     
-    void showConnections(int v){
+    void showConnections(int v){ //Exibindo coneções 
         No* present = vertices[v];
         
         cout << "Ligações entre as pistas:"<< present->idClue << endl;
@@ -161,372 +175,414 @@ class Grafo{
             cout<< present->connection[i]->idClue << endl;
         }
     }
+    
+    void showReasoningLine(string clueKey){ //Exibindo linha de raciocínio visualmente com grafo
+      for(int i = 0; i < numVertices; i++){
+          if(vertices[i]->idClue == clueKey){
+              cout << "\nLinha de raciocinio:\n\n";
+
+              cout << vertices[i]->idClue;
+
+              No* current = vertices[i];
+
+              while(current->numConnections > 0){
+                  current = current->connection[0];
+                  cout << " -> " << current->idClue;
+              }
+
+              cout << endl;
+              return;
+          }
+      }
+    }
 
 };
+void showDeduction(Grafo &graph, string clueKey);
 
-bool checkAnswer(Clue pista){
-    string reponse;
-    
-    cout << pista.question << endl;
-    getline(cin, reponse);
-    
-    return reponse == pista.correctReponse;
+//---------------[Inventário]---------------
+void addInventory(Clue inventory[],int &totalClues,Clue clue){
+  inventory[totalClues] = clue;
+  totalClues++;
+
+  cout << "\n[Pista adicionada ao inventario]\n";
+}
+void showInventory(Clue inventory[],int totalClues){
+  cout << "\n===== INVENTARIO DE PISTAS =====\n";
+
+  if(totalClues == 0){
+    cout << "Nenhuma pista encontrada.\n";
+    return;
+  }
+
+  for(int i = 0; i < totalClues; i++){
+
+    cout << "\n[" << inventory[i].title << "]\n";
+
+    cout << inventory[i].description << endl;
+  }
+
+  cout << endl;
 }
 
-string continuar;
 
-int main() {
-  TabelaHash table;
-  Clue c1;
-  c1.idClue = 1;
-  c1.description = "Uma faca ensanguentada na cozinha...";
-  c1.question = "A faca pertence a quem?";
-  c1.correctReponse = "Cozinheiro";
-  
-  
+//---------------[Sistemas]---------------
+bool checkAnswer(Clue &pista){ //Verifica Pista
+
+  int response;
+
+  cout << "\n" << pista.question << endl;
+
+  for(int i = 0; i < 4; i++){
+    cout << i + 1 << " - " << pista.options[i] << endl;
+  }
+
+  cin >> response;
+  cin.ignore();
+
+  if(response == pista.correctReponse){
+    cout << "\nHolmes observa a cena em silencio.\n";
+    cout << "\"Interessante... muito interessante.\"\n";
+
+    pista.resolvida = true;
+
+    return true;
+  }
+
+  cout << "\n\"Nao. Algo nao encaixa.\"\n";
+  return false;
+}
+void investigateClue(TabelaHash &table, Grafo &graph,string key, Clue inventory[], int &totalClues, int &realCluesSolved){
+  Clue clue = table.search(key);
+
+  if(clue.idClue == -1){
+    return;
+  }
+
+  if(clue.descoberta){
+    cout << "\nEssa pista ja foi investigada.\n";
+    return;
+  }
+  clue.descoberta = true;
+
+  cout << "\n------[" << clue.title << "]------\n";
+  cout << clue.description << endl;
+
+  addInventory(inventory, totalClues, clue);
+
+  bool correct = checkAnswer(clue);
+  if(correct && clue.realClue){
+    realCluesSolved++;
+    cout << "\n[Holmes liga essa pista ao assassinato]\n";
+    
+    showDeduction(graph, key);
+  }
+
+  cout << "\nProgresso da investigacao: " << realCluesSolved << "/3 pistas principais.\n";
+  table.input(key, clue);
+}
+void showDeduction(Grafo &graph, string clueKey){
+    
+    cout << "\n[Holmes analisa as conexoes mentais]\n";
+    graph.showReasoningLine(clueKey);
+
+
+    if(clueKey == "P1"){
+        cout << "A faca foi parcialmente limpa.\n";
+        cout << "Isso sugere tentativa de esconder o assassinato.\n";
+    }
+
+    else if(clueKey == "P2"){
+        cout << "O golpe veio de baixo para cima.\n";
+        cout << "O assassino provavelmente era menor.\n";
+    }
+
+    else if(clueKey == "P3"){
+        cout << "A violencia foi emocional.\n";
+        cout << "Nao foi um assassinato frio.\n";
+    }
+}
+
+//---------------[História]---------------
+void introStory(){
   cout << "===== INVESTIGACAO POLICIAL =====" << endl;
-  cin >> continuar;
+  next();
 
   cout << "Londres -- 15 de Janeiro de 2010, 22:20" << endl;
-  cin >> continuar;
+  next();
 
-  cout << "A chuva fina castigava as ruas de Londres, a nevoa envolvia os postes de luz, transformando o brilho amarelado em manchas fantasmagoricas no asfalto molhado." << endl;
-  cin >> continuar;
+  cout << "A chuva fina castigava as ruas de Londres..." << endl;
+  next();
 
-  cout << "Dentro de um taxi escuro, Sherlock Holmes observava silenciosamente o lado de fora enquanto John Watson terminava de vestir suas luvas." << endl;
-  cin >> continuar;
+  cout << "Dentro de um taxi escuro..." << endl;
+  next();
 
   cout << "O veiculo desacelera." << endl;
-  cin >> continuar;
+  next();
 
-  cout << "A frente, uma enorme residencia vitoriana cercada por grades negras emerge da neblina." << endl;
-  cin >> continuar;
-
-  cout << "Luzes policiais iluminam a fachada." << endl;
-  cin >> continuar;
-
-  cout << "Duas viaturas." << endl;
-  cout << "Uma ambulancia." << endl;
-  cin >> continuar;
-
-  cout << "Assim que descem do carro, dois policias os aguardam proximos a entrada principal." << endl;
-  cin >> continuar;
-
-  cout << "Um deles, alto, cansado e claramente pressionado, aproxima-se rapidamente." << endl;
-  cin >> continuar;
-
-  cout<<"== Policial 1 =="<<endl;
-  cout << "-- Detetive Holmes... graças a Deus chegou." << endl;
-  cin >> continuar;
-
-  cout << "Ele estende a mao." << endl;
-  cin >> continuar;
-
-  cout<<"== Inspetor Carter =="<<endl;
-  cout << "-- Inspetor William Carter." << endl;
-  cin >> continuar;
-
-  cout << "Ao lado dele, um homem mais jovem mantem expressao seria." << endl;
-  cin >> continuar;
-
-  cout<<"== Oficial Miller =="<<endl;
-  cout << "-- Oficial David Miller." << endl;
-  cin >> continuar;
-
-  cout << "William respira fundo antes de continuar." << endl;
-  cin >> continuar;
-
-  cout<<"== Inspetor Carter =="<<endl;
-  cout << "-- O patriarca da familia, Raymond Whitmore, foi brutalmente assassinado ha cerca de uma hora." << endl;
-  cin >> continuar;
-
-  cout<<"== Inspetor Carter =="<<endl;
-  cout << "-- Nao encontramos sinais de arrombamento. Nenhuma testemunha. Nenhuma pista concreta." << endl;
-  cin >> continuar;
-
-  cout << "William encara Holmes." << endl;
-  cin >> continuar;
-
-  cout<<"== Inspetor Carter =="<<endl;
-  cout << "-- Mas quem fez isso... sabia exatamente o que estava fazendo." << endl;
-  cin >> continuar;
-
-  cout << "David abre a porta da residencia." << endl;
-  cin >> continuar;
-
-  cout<<"== Oficial Miller =="<<endl;
-  cout << "-- Os familiares estao reunionados na sala de estar. Ninguem saiu da casa desde nossa chegada." << endl;
-  cin >> continuar;
-
-  cout<<"== Oficial Miller =="<<endl;
-  cout << "-- O corpo esta na cozinha." << endl;
-  cin >> continuar;
-
-  cout << "Sherlock apenas ajeita o casaco." << endl;
-  cin >> continuar;
-
-  cout<<"== Sherlock =="<<endl;
-  cout << "-- Naturalmente esta." << endl;
-  cin >> continuar;
-
+  cout << "A frente, uma enorme residencia vitoriana..." << endl;
+  next();
+}
+void crimeScene(){
   cout << endl << "=== CENA DO CRIME -- COZINHA ===" << endl;
-  cin >> continuar;
+  next();
 
-  cout << "Ao entrarem, o cheiro-metalico do sangue domina imediatamente o ambiente." << endl;
-  cin >> continuar;
+  cout << "Ao entrarem, o cheiro-metalico do sangue..." << endl;
+  next();
 
   cout << "A cozinha luxuosa parece congelada no tempo." << endl;
-  cin >> continuar;
-
-  cout << "Panelas ainda estao sobre o fogao." << endl;
-  cout << "Uma taça de vinho cahida lentamente pinga sobre o marmore branco." << endl;
-  cout << "O relogio na parede continua funcionando." << endl;
-  cin >> continuar;
-
-  cout << "Tick." << endl;
-  cout << "Tick." << endl;
-  cout << "Tick." << endl;
-  cin >> continuar;
+  next();
 
   cout << "No centro da cozinha..." << endl;
-  cin >> continuar;
+  next();
 
   cout << "o corpo." << endl;
-  cin >> continuar;
+  next();
+}
 
-  cout << "Um homem de meia idade, elegante, cahido ao lado da ilha central." << endl;
-  cin >> continuar;
-
-  cout << "A camisa social branca esta completamente tingida de vermelho." << endl;
-  cin >> continuar;
-
-  cout << "Uma faca de cozinha permanece cravada em seu peito." << endl;
-  cin >> continuar;
-
-  cout << "Ao redor do corpo:" << endl;
-  cout << "sangue." << endl;
-  cout << "Pegadas borradas." << endl;
-  cout << "Marcas de luta." << endl;
-  cin >> continuar;
-
-  cout << "Watson se aproxima lentamente." << endl;
-  cin >> continuar;
-
-  cout << "-- Meu Deus..." << endl;
-  cin >> continuar;
-
-  cout << "Sherlock permanece em silencio. Observando. Calculando." << endl;
-  cin >> continuar;
-
-  cout << endl << "=== PISTAS REAIS -- FACA DO CRIME ===" << endl;
-  cin >> continuar;
-
-  cout << "1. A faca foi limpa parcialmente" << endl;
-  cout << "Há sangue na lamina... mas quase nenhuma impressao digital." << endl;
-  cout << "Isso indica:" << endl;
-  cout << "- o assassino tentou limpar;" << endl;
-  cout << "- porem esqueceu partes pequenas proximas ao cabo." << endl;
-  cin >> continuar;
-
-  cout << "2. A posicao da faca e estranha" << endl;
-  cout << "A faca entrou em um angulo incomum." << endl;
-  cout << "Isso sugere:" << endl;
-  cout << "- o assassino era mais baixo;" << endl;
-  cout << "OU" << endl;
-  cout << "- golpeou enquanto a vtima estava sentada." << endl;
-  cin >> continuar;
-
-  cout << "3. Existem microfissuras no cabo" << endl;
-  cout << "Como se alguém tivesse apertado a faca com forca excessiva." << endl;
-  cout << "Indica:" << endl;
-  cout << "- tensao extrema;" << endl;
-  cout << "- adrenalina;" << endl;
-  cout << "- obsessao emocional." << endl;
-  cin >> continuar;
-
-  cout << endl << "=== DETALHES IMPORTANTES DO AMBIENTE ===" << endl;
-  cin >> continuar;
-
-  cout << "1. Uma cadeira cahida" << endl;
-  cout << "Mas distante demais da luta." << endl;
-  cout << "Parece placementa propositalmente." << endl;
-  cin >> continuar;
-
-  cout << "2. Taca de vinho quebrada" << endl;
-  cout << "Existe apenas UMA taca." << endl;
-  cout << "O Homem estava sozinho antes do ataque." << endl;
-  cin >> continuar;
-
-  cout << "3. Pequenos pingos de sangue perto da pia" << endl;
-  cout << "Como se alguém tivesse lavado rapidamente as maos." << endl;
-  cin >> continuar;
-
-  cout << endl << "=== 4 PISTAS FALSAS (RED HERRINGS) ===" << endl;
-  cin >> continuar;
-
-  cout << "1. Lenco da esposa" << endl;
-  cout << "Encontrado proximo ao corpo." << endl;
-  cin >> continuar;
-
-  cout << "2. Discussao recente do filho mais velho" << endl;
-  cout << "Empregados ouviram os dois brigando sobre a aposentadoria do homem, e o seu filho mais velho criticando a decisao de nao por seu nome como o proximo dono das empresas da familia." << endl;
-  cin >> continuar;
-
-  cout << "3. Marca de cigarro do mordomo" << endl;
-  cout << "Bitucas encontradas perto da cozinha." << endl;
-  cin >> continuar;
-
-  cout << "4. Um remedies antidepressant do filho do meio" << endl;
-  cout << "Encontrado no lixo." << endl;
-  cin >> continuar;
-
-  cout << endl << "=== SALA DE INTERROGATORIO ===" << endl;
-  cin >> continuar;
-
-  cout << "A Esposa -- Eleanor Whitmore" << endl;
+//---------------[Interrogatórios]---------------
+void eleanorInterrogation(){
+  cout << endl << "=== A ESPOSA -- ELEANOR WHITMORE ===" << endl;
+  
   cout << "Elegante." << endl;
   cout << "Olhos cansados." << endl;
   cout << "Maos tremulas." << endl;
-  cin >> continuar;
-
+  
+  next();
+  
   cout << "Pergunta: Como era sua relacao com seu marido?" << endl;
-  cout << "-- Distante... ultimamente muito distante. Ele nao ficava em casa. Vivia voltando tarde do trabalho." << endl;
-  cin >> continuar;
-
-  cout << "Ela evita olhar diretamente." << endl;
-  cin >> continuar;
-
+  
+  cout << "-- Distante... ultimamente muito distante." << endl;
+  cout << "-- Ele nao ficava em casa." << endl;
+  cout << "-- Vivia voltando tarde do trabalho." << endl;
+  
+  next();
+  
+  cout << "Ela evita olhar diretamente para Holmes." << endl;
+  
+  next();
+  
   cout << "Pergunta: A senhora suspeitava de traicao?" << endl;
-  cout << "Ela demora para responder." << endl;
+  
+  cout << "Ela demora alguns segundos para responder." << endl;
+  
   cout << "-- Um pouco." << endl;
-  cin >> continuar;
-
-  cout << "Ela projeta um olhar um pouco arrependido." << endl;
-  cin >> continuar;
-
+  
+  next();
+  
+  cout << "Ela projeta um olhar arrependido." << endl;
+  
+  next();
+  
   cout << "Pergunta: Onde estava durante o assassinato?" << endl;
-  cout << "-- No meu quarto. Estou com um problema de insonia recentemente, entao estou tomando remedios para auxiliar a dormir." << endl;
-  cin >> continuar;
+  
+  cout << "-- No meu quarto." << endl;
+  cout << "-- Estou enfrentando insonia recentemente." << endl;
+  cout << "-- Tenho tomado remedios para dormir." << endl;
+  
+  next();
+  
+  cout << "Watson observa atentamente." << endl;
+  
+  next();
+  
+  cout << "Ela nao aparenta estar sob efeito de sedativos." << endl;
+  
+  next();
+}
+void arthurInterrogation(){
+  cout << endl << "=== FILHO MAIS VELHO -- ARTHUR WHITMORE ===" << endl;
 
-  cout << "Mas Watson percebe:" << endl;
-  cout << "ela nao parece estar sobre um efeito de sedativos." << endl;
-  cin >> continuar;
-
-  cout << endl << "Filho Mais Velho -- Arthur Whitmore" << endl;
   cout << "Controlado." << endl;
   cout << "Ambicioso." << endl;
   cout << "Frio." << endl;
-  cin >> continuar;
+
+  next();
 
   cout << "Pergunta: Voce queria assumir a empresa?" << endl;
-  cout << "Ele fala em um tom arisco." << endl;
+
+  cout << "Ele responde rapidamente." << endl;
+
   cout << "-- Alguem precisava assumir eventualmente!" << endl;
-  cout << "-- Eleiria ter que se aposentar e nao ha pessoa mais adequada para gerir a empresa do que eu." << endl;
-  cin >> continuar;
+  cout << "-- Meu pai nao poderia continuar para sempre." << endl;
+
+  next();
 
   cout << "Pergunta: Seu pai pretendia mudar o testamento?" << endl;
-  cout << "Ele trava por meio segundo." << endl;
-  cout << "-- Nao!" << endl;
+
+  cout << "Arthur hesita por um breve instante." << endl;
+
+  cout << "-- Nao." << endl;
   cout << "-- Nao que eu saiba." << endl;
-  cin >> continuar;
 
-  cout << "Ele olha para todos ao seu redor. Mas em especifico, encara a mae com um olhar de indagem." << endl;
-  cin >> continuar;
+  next();
 
-  cout << "A mae, nao responde." << endl;
-  cin >> continuar;
+  cout << "Ele encara Eleanor por alguns segundos." << endl;
 
-  cout << "Pergunta: Vocês discutiram hoje?" << endl;
-  cout << "-- Sim... Mas nao foi algo tao intenso!" << endl;
-  cout << "-- Se acha que eu sou capaz de matar o MEU PAI, voce esta maluco!" << endl;
-  cin >> continuar;
+  next();
 
-  cout << endl << "Filho do Meio -- Edward Whitmore" << endl;
+  cout << "Ela desvia o olhar." << endl;
+
+  next();
+
+  cout << "Pergunta: Voces discutiram hoje?" << endl;
+
+  cout << "-- Sim." << endl;
+  cout << "-- Mas nao foi nada fora do normal." << endl;
+
+  next();
+
+  cout << "Ele fecha os punhos." << endl;
+
+  cout << "-- Se acha que eu mataria meu proprio pai..." << endl;
+  cout << "-- entao esta completamente maluco." << endl;
+
+  next();
+}
+void edwardInterrogation(){
+  cout << endl << "=== FILHO DO MEIO -- EDWARD WHITMORE ===" << endl;
+
   cout << "Nervoso." << endl;
   cout << "Ansioso." << endl;
   cout << "Instavel." << endl;
-  cin >> continuar;
+
+  next();
 
   cout << "Pergunta: Voce tinha problemas com seu pai?" << endl;
-  cout << "-- Ele... nunca me respeitou." << endl;
-  cout << "-- Vivia se gabando do Art, mas nunca falou nada de mim." << endl;
-  cin >> continuar;
 
-  cout << "Os olhos dele indicam um leve sentimento de vazio." << endl;
-  cin >> continuar;
+  cout << "-- Ele nunca me respeitou." << endl;
+  cout << "-- Sempre comparava tudo o que eu fazia com Arthur." << endl;
 
-  cout << "Pergunta: Onde estava?" << endl;
-  cout << "-- No jardim..." << endl;
-  cin >> continuar;
+  next();
 
-  cout << "E oque estava fazendo?" << endl;
-  cout << "-- Observando o ceu. Depois que eu comecei a ouvir a briga. Nao gosto disso." << endl;
-  cin >> continuar;
+  cout << "Os olhos dele demonstram ressentimento." << endl;
 
-  cout << "Mentira parcial." << endl;
-  cout << "(Ele estava fumando)" << endl;
-  cin >> continuar;
+  next();
 
-  cout << "Pergunta: Voce ouviu algo?" << endl;
-  cout << "-- Enquanto eu subia para o meu quarto, escutei um leve barulho de passos. Mas nada alem disso" << endl;
-  cin >> continuar;
+  cout << "Pergunta: Onde estava durante o assassinato?" << endl;
 
-  cout << "Os passos da irma." << endl;
-  cin >> continuar;
+  cout << "-- No jardim." << endl;
 
-  cout << endl << "Filha Cacula -- Violet Whitmore" << endl;
+  next();
+
+  cout << "Pergunta: Fazendo o que?" << endl;
+
+  cout << "-- Pensando." << endl;
+  cout << "-- Eu ouvi a discussao..." << endl;
+  cout << "-- Nao queria participar daquilo." << endl;
+
+  next();
+
+  cout << "Holmes percebe cheiro de cigarro em sua roupa." << endl;
+
+  next();
+
+  cout << "Pergunta: Voce ouviu alguma coisa suspeita?" << endl;
+
+  cout << "-- Passos." << endl;
+  cout << "-- Alguem andando rapido pelo corredor." << endl;
+  cout << "-- Mas nao consegui ver quem era." << endl;
+
+  next();
+}
+void violetInterrogation(){
+  cout << endl << "=== FILHA CACULA -- VIOLET WHITMORE ===" << endl;
+
   cout << "Calma demais." << endl;
   cout << "Esse e o problema." << endl;
-  cin >> continuar;
+
+  next();
 
   cout << "Pergunta: Voce gostava do seu pai?" << endl;
+
   cout << "Ela sorri discretamente." << endl;
-  cout << "-- Muito. Nossa relacao era maravilhosa." << endl;
-  cin >> continuar;
+
+  cout << "-- Muito." << endl;
+  cout << "-- Nossa relacao era maravilhosa." << endl;
+
+  next();
 
   cout << "Pergunta: Esta triste?" << endl;
-  cout << "Ela encara Holmes." << endl;
-  cout << "-- E como nao estar mais triste?" << endl;
-  cin >> continuar;
 
-  cout << "Sherlock em seus pensamentos:" << endl;
-  cout << "Ela diz que sente, mas nao apresenta." << endl;
-  cin >> continuar;
+  cout << "Ela encara Holmes em silencio." << endl;
+
+  cout << "-- E como nao estaria?" << endl;
+
+  next();
+
+  cout << "Sherlock observa atentamente." << endl;
+
+  next();
+
+  cout << "Ela fala sobre tristeza." << endl;
+  cout << "Mas nao demonstra nenhuma." << endl;
+
+  next();
 
   cout << "Pergunta: O que acha que aconteceu?" << endl;
-  cout << "-- Acho que alguém finalmente perdeu o medo dele." << endl;
-  cin >> continuar;
 
-  cout << "Essa frase e MUITO importante." << endl;
-  cin >> continuar;
+  cout << "-- Acho que alguem finalmente perdeu o medo dele." << endl;
 
-  cout << endl << "Mordomo -- Alfred" << endl;
+  next();
+
+  cout << "A sala inteira permanece em silencio por alguns segundos." << endl;
+
+  next();
+}
+void alfredInterrogation(){
+  cout << endl << "=== MORDOMO -- ALFRED ===" << endl;
+
   cout << "Velho." << endl;
   cout << "Exausto." << endl;
   cout << "Amargurado." << endl;
-  cin >> continuar;
+
+  next();
 
   cout << "Pergunta: Como Raymond o tratava?" << endl;
-  cout << "-- Como mobilia." << endl;
-  cin >> continuar;
 
-  cout << "Pergunta: Ouviu algo?" << endl;
+  cout << "-- Como mobilia." << endl;
+  cout << "-- Eu servia a esta familia ha mais de vinte anos." << endl;
+
+  next();
+
+  cout << "Pergunta: O senhor ouviu algo?" << endl;
+
   cout << "-- Passos rapidos no corredor." << endl;
-  cin >> continuar;
+
+  next();
 
   cout << "Pergunta: Reconheceu os passos?" << endl;
+
   cout << "Ele hesita." << endl;
-  cout << "-- ...leves demais para serem de um homem." << endl;
-  cin >> continuar;
 
-  cout << "Pista da filha." << endl;
-  cin >> continuar;
+  cout << "-- Leves demais para serem de um homem." << endl;
 
-  cout << endl << "=== MELHOR TIPO DE FINAL ===" << endl;
-  cin >> continuar;
+  next();
 
+  cout << "Holmes permanece em silencio." << endl;
+
+  next();
+}
+void interrogationScene(){
+  cout << endl << "=== SALA DE INTERROGATORIO ===" << endl;
+
+  next();
+
+  eleanorInterrogation();
+
+  arthurInterrogation();
+
+  edwardInterrogation();
+
+  violetInterrogation();
+
+  alfredInterrogation();
+}
+
+
+//---------------[Final]---------------
+void bestEnding(){
   cout << "Sherlock reunia todos." << endl;
-  cin >> continuar;
+  next();
 
   cout << "E explica:" << endl;
   cout << "- as facadas eram exageradas demais;" << endl;
@@ -535,23 +591,262 @@ int main() {
   cout << "- alguém lavou as maos;" << endl;
   cout << "- passos leves;" << endl;
   cout << "- ausencia de emocao genuina." << endl;
-  cin >> continuar;
+  next();
 
   cout << "Entao Holmes encara Violet." << endl;
-  cin >> continuar;
+  next();
 
   cout << "E ela..." << endl;
-  cin >> continuar;
+  next();
 
   cout << "sorri." << endl;
-  cin >> continuar;
+  next();
 
   cout << "Não porque foi pega." << endl;
-  cin >> continuar;
+  next();
 
   cout << "Mas porque:" << endl;
   cout << "finalmente encontrou alguém capaz de entendê-la." << endl;
-  cin >> continuar;
+  next();
 
   cout << endl << "===== FIM =====" << endl;
+};
+
+//---------------[Menus Acusações]---------------
+void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClues, int &realCluesSolved){ //Menu da cena da cozinha
+  int opt = 0;
+  
+  do{
+    cout<<"[COZINHA]\n"<< endl;
+    
+    cout << "1 - Examinar faca\n2 - Examinar corte\n3 - Examinar cabo da faca\n4 - Examinar corpo da vitma\n5 - Examinar vestigios na porta da cozinha\n6 - Falar com empregados\n7 - Examinar lixeira\n8 - Ver pistas\n9 - Acusacao\n0 - Encerrar Investigacao" << endl;
+    cin >> opt;
+    cin.ignore();
+      
+    switch(opt){
+      case 1:
+        investigateClue(table, graph, "P1",inventory, totalClues, realCluesSolved);
+        break;
+          
+      case 2:
+        investigateClue(table, graph, "P2",inventory, totalClues, realCluesSolved);
+        break;
+          
+      case 3:
+        investigateClue(table, graph, "P3",inventory, totalClues, realCluesSolved);
+        break;
+          
+      case 4:
+        investigateClue(table, graph, "P4",inventory, totalClues, realCluesSolved);
+        break;
+
+      case 5:
+        investigateClue(table, graph, "P5",inventory, totalClues, realCluesSolved);
+        break;
+          
+      case 6:
+        investigateClue(table, graph, "P6",inventory, totalClues, realCluesSolved);
+        break;
+          
+      case 7:
+        investigateClue(table, graph, "P7",inventory, totalClues, realCluesSolved);
+        break;
+      
+      case 8:
+        showInventory(inventory, totalClues);
+        break;
+          
+      case 9:
+        if(realCluesSolved >= 3){
+          accusationMenu();
+        }else{
+          cout << "\nHolmes ainda nao possui evidencias suficientes.\n";
+        }
+        break;
+          
+      default:
+        cout << "Investigação encerrada." << endl;
+    }
+  } while(opt != 0);
+}
+void accusationMenu(){ //Cena de acusação
+  int opt = 0;
+
+  cout << "\nQuem e o assassino?\n";
+  cout << "1 - Eleanor\n2 - Arthur\n3 - Edward\n4 - Violet\n5 - Alfred\n";
+
+  cin >> opt;
+
+  if(opt == 4){
+    cout << "\nSherlock observa Violet em silencio...\n";
+    cout << "Ela sorri.\n";
+    
+    bestEnding();
+  }
+  else{
+    cout << "\nHolmes fecha os olhos.\n";
+    cout << "A acusacao nao se sustenta.\n";
+  }
+}
+
+//---------------[Criações]---------------
+void creatClues(TabelaHash &table){
+  //----------[Pista 1]----------
+  Clue knife;
+  knife.idClue = 1;
+  knife.title = "Faca";
+  knife.description = "A lâmina ainda possui sangue. Porém, quase não existem impressões digitais. Pequenas marcas de tecido podem ser vistas próximas ao cabo.";
+  
+  knife.question = "O que a ausencia parcial de digitais indica?";
+  knife.options[0] = "A arma foi trocada";
+  knife.options[1] = "O assassino tentou limpar a faca";
+  knife.options[2] = "A vitima segurou a faca";
+  knife.options[3] = "O sangue foi plantado";
+
+  knife.correctReponse = 2;
+  knife.realClue = true;
+  table.input("P1", knife);
+  
+  
+  
+  //----------[Pista 2]----------
+  Clue positionKnife;
+  positionKnife.idClue = 2;
+  positionKnife.title = "Posicao da Faca";
+  positionKnife.description = "O golpe entrou em um ângulo incomum...a perfuração veio de baixo para cima. A vítima aparentemente estava em pé.";
+  positionKnife.question = "O que voce conclui sobre quem realizou esse golpe?";
+  
+  positionKnife.options[0] = "O assassino era mais alto";
+  positionKnife.options[1] = "O assassino atacou a distancia";
+  positionKnife.options[2] = "O assassino era mais baixo";
+  positionKnife.options[3] = "Existiam dois assassinos";
+
+  positionKnife.correctReponse = 3;
+  positionKnife.realClue = true;
+  table.input("P2", positionKnife);
+  
+  
+ 
+  //----------[Pista 3]----------
+  Clue knifeHandle;
+  knifeHandle.idClue = 3;
+  knifeHandle.title = "Cabo com microfissuras";
+  knifeHandle.description = "A forca aplicada na faca indica uma adrenalina alta, a pessoa estava em extrema tensao.";
+  knifeHandle.question = "Que tipo de estado emocional o assassino demonstrava?";
+  knifeHandle.options[0] = "Raiva";
+  knifeHandle.options[1] = "Ansiedade";
+  knifeHandle.options[2] = "Nervosismo";
+  knifeHandle.options[3] = "Medo";
+
+  knifeHandle.correctReponse = 3;
+  knifeHandle.realClue = true;
+  table.input("P3", knifeHandle);
+  
+  
+  
+  //----------[Pista Falsa 1]----------
+  Clue tissue;
+  tissue.idClue = 4;
+  tissue.title = "Lenço da esposa";
+  tissue.description = "Uma espécie de lenço feminino, manchado de sangue, encontrado proximo ao corpo. Voce sente um cheiro de perfume quando aproxima ele em seu rosto.";
+  tissue.question = "A quem esse lenço pertence?";
+  
+  tissue.options[0] = "Violet";
+  tissue.options[1] = "Eleanor";
+  tissue.options[2] = "A empregada";
+  tissue.options[3] = "Uma visitante";
+
+  tissue.correctReponse = 2;
+  table.input("P4", tissue);
+  
+  
+  
+  //----------[Pista Falsa 2]----------
+  Clue cigarette;
+  cigarette.idClue = 5;
+  cigarette.title = "Cigarros do Mordomo";
+  cigarette.description = "Cinzas de cigarro foram encontradas próximas à entrada da cozinha. A bituca de cigarro ainda esta morna";
+  cigarette.question = "Quem possui o hábito de fumar?";
+  
+  cigarette.options[0] = "Arthur";
+  cigarette.options[1] = "Edward";
+  cigarette.options[2] = "Alfred";
+  cigarette.options[3] = "William Carter";
+
+  cigarette.correctReponse = 3;
+  table.input("P5", cigarette);
+ 
+ 
+ 
+  //----------[Pista Falsa 3]----------
+  Clue discussion;
+  discussion.idClue = 6;
+  discussion.title = "Discussão recente do filho mais velho";
+  discussion.description = "Empregados relataram uma discussão intensa horas antes do assassinato. O assunto envolvia herança e controle da empresa da família.";
+  discussion.question = "Quem discutiu com a vítima?";
+  
+  discussion.options[0] = "Eleanor";
+  discussion.options[1] = "Alfred";
+  discussion.options[2] = "Edward";
+  discussion.options[3] = "Arthur";
+
+  discussion.correctReponse = 4;
+  table.input("P6", discussion);
+ 
+ 
+ 
+  //----------[Pista Falsa 4]----------
+  Clue medication;
+  medication.idClue = 7;
+  medication.title = "Remédio antdepressivo";
+  medication.description = "Um remedio antidepressivo foi encontrado no lixo. Mas o nome do paciente estava parcialmente rasgado";
+  medication.question = "Qual suspeito demonstra uma instabilidade emocional?";
+  
+  medication.options[0] = "Arthur";
+  medication.options[1] = "Violet";
+  medication.options[2] = "Edward";
+  medication.options[3] = "Alfred";
+
+  medication.correctReponse = 3;
+  table.input("P7", medication);
+}
+void createConnectionsClue(Grafo &graph){
+  graph.addNo("P1", 1);
+  graph.addNo("P2", 1);
+  graph.addNo("P3", 1);
+
+  graph.addNo("P4", 2);
+  graph.addNo("P5", 2);
+  graph.addNo("P6", 2);
+  graph.addNo("P7", 2);
+
+  //Conexões entre pistas que existem
+  graph.addConnections(0,1);
+  graph.addConnections(1,2);
+
+  //Conexões falsas
+  graph.addConnections(4,6);
+}
+
+//---------------[Main]---------------
+int main() {
+  TabelaHash table;
+
+  Grafo gInvestigation;
+
+  Clue inventory[20];
+  int totalClues = 0;
+
+  int realCluesSolved = 0;
+
+  creatClues(table);
+  createConnectionsClue(gInvestigation);
+
+  introStory();
+  crimeScene();
+  interrogationScene();
+
+  kitchenMenu(table, gInvestigation, inventory, totalClues, realCluesSolved);
+
+  return 0;
 }
