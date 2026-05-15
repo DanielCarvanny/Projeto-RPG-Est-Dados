@@ -217,13 +217,81 @@ void showInventory(Clue inventory[],int totalClues){
 }
 
 
-bool checkAnswer(Clue pista){
-    string reponse;
+//---------------[Sistemas]---------------
+bool checkAnswer(Clue &pista){ //Verifica Pista
+
+  int response;
+
+  cout << "\n" << pista.question << endl;
+
+  for(int i = 0; i < 4; i++){
+    cout << i + 1 << " - " << pista.options[i] << endl;
+  }
+
+  cin >> response;
+  cin.ignore();
+
+  if(response == pista.correctReponse){
+    cout << "\nHolmes observa a cena em silencio.\n";
+    cout << "\"Interessante... muito interessante.\"\n";
+
+    pista.resolvida = true;
+
+    return true;
+  }
+
+  cout << "\n\"Nao. Algo nao encaixa.\"\n";
+  return false;
+}
+void investigateClue(TabelaHash &table, Grafo &graph,string key, Clue inventory[], int &totalClues, int &realCluesSolved){
+  Clue clue = table.search(key);
+
+  if(clue.idClue == -1){
+    return;
+  }
+
+  if(clue.descoberta){
+    cout << "\nEssa pista ja foi investigada.\n";
+    return;
+  }
+  clue.descoberta = true;
+
+  cout << "\n------[" << clue.title << "]------\n";
+  cout << clue.description << endl;
+
+  addInventory(inventory, totalClues, clue);
+
+  bool correct = checkAnswer(clue);
+  if(correct && clue.realClue){
+    realCluesSolved++;
+    cout << "\n[Holmes liga essa pista ao assassinato]\n";
     
-    cout << pista.question << endl;
-    getline(cin, reponse);
+    showDeduction(graph, key);
+  }
+
+  cout << "\nProgresso da investigacao: " << realCluesSolved << "/3 pistas principais.\n";
+  table.input(key, clue);
+}
+void showDeduction(Grafo &graph, string clueKey){
     
-    return reponse == pista.correctReponse;
+    cout << "\n[Holmes analisa as conexoes mentais]\n";
+    graph.showReasoningLine(clueKey);
+
+
+    if(clueKey == "P1"){
+        cout << "A faca foi parcialmente limpa.\n";
+        cout << "Isso sugere tentativa de esconder o assassinato.\n";
+    }
+
+    else if(clueKey == "P2"){
+        cout << "O golpe veio de baixo para cima.\n";
+        cout << "O assassino provavelmente era menor.\n";
+    }
+
+    else if(clueKey == "P3"){
+        cout << "A violencia foi emocional.\n";
+        cout << "Nao foi um assassinato frio.\n";
+    }
 }
 
 string continuar;
