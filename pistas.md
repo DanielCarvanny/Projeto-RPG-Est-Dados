@@ -19,7 +19,7 @@ B. Evidências do Ambiente
     
 - `pista_sangue_pia`: Pequenos pingos de sangue perto da pia. O padrão de diluição mostra que alguém lavou rapidamente as mãos ali logo após o ataque. Um cheiro do detergente permanece no local, um cheiro agradável de Lavanda.
     
-- `pista_lenco_esposa`: Um lenço de seda fina com o monograma "E.W.", encontrado muito próximo à faca e parcialmente ensanguentado. Ao inspecionar a fundo, nota-se uma mancha escura de ferrugem de metal velho.
+- `pista_lenço_ensanguentado_ferrugem`: Um lenço de seda fina com o monograma "E.W.", encontrado muito próximo à faca e parcialmente ensanguentado. Ao inspecionar a fundo, nota-se uma mancha escura de ferrugem de metal velho.
 
 
 ### C. Evidências Ocultas / Red Herrings (Pistas Falsas)

@@ -384,4 +384,4 @@ Não porque foi pega.
 
 Mas porque:
 
-> finalmente encontrou alguém capaz de entendê-la.
+finalmente encontrou alguém capaz de entendê-la.

@@ -10,7 +10,7 @@ Este projeto é um jogo de investigação policial em C++ que utiliza estruturas
 
 ## Clue
 
-Estrutura responsável por representar uma pista investigativa.
+* **Descrição:** Estrutura responsável por representar uma pista investigativa.
 
 | Campo          | Tipo      | Descrição                                   |
 | -------------- | --------- | ------------------------------------------- |
@@ -28,7 +28,7 @@ Estrutura responsável por representar uma pista investigativa.
 
 ## No (TabelaHash)
 
-Estrutura utilizada internamente pela tabela hash.
+* **Descrição:** Estrutura utilizada internamente pela tabela hash.
 
 | Campo | Tipo   | Descrição                       |
 | ----- | ------ | ------------------------------- |
@@ -40,7 +40,7 @@ Estrutura utilizada internamente pela tabela hash.
 
 ## Suspects
 
-Estrutura utilizada para representar suspeitos.
+* **Descrição:** Estrutura utilizada para representar suspeitos.
 
 | Campo        | Tipo   | Descrição                       |
 | ------------ | ------ | ------------------------------- |
@@ -52,7 +52,7 @@ Estrutura utilizada para representar suspeitos.
 
 ## No (Grafo)
 
-Estrutura responsável pelos nós do grafo investigativo.
+* **Descrição:** Estrutura responsável pelos nós do grafo investigativo.
 
 | Campo          | Tipo   | Descrição                  |
 | -------------- | ------ | -------------------------- |
@@ -178,59 +178,65 @@ O grafo é utilizado para exibir a linha de raciocínio investigativa de Sherloc
 
 # Sistemas do Projeto
 
-## Sistema de Investigação
-
-Responsável por:
-
-* Buscar pistas na tabela hash
-* Registrar pistas descobertas
-* Validar respostas do jogador
-* Atualizar progresso da investigação
-* Mostrar deduções de Sherlock Holmes
+### Sistema de Investigação
+* **Descrição:** Gerencia a lógica central de investigação, desde a descoberta de uma pista até a dedução de Holmes.
+* **Funções Associadas:** `investigateClue()`.
 
 ---
 
-## Sistema de Inventário
+### Sistema de Inventário
+* **Descrição:** Controla as pistas que o jogador coleta, permitindo que sejam adicionadas e visualizadas.
+* **Funções Associadas:** `addInventory()`, `showInventory()`.
 
-O jogador possui um inventário de pistas encontradas durante a investigação.
+#### addInventory(Clue inventory[], int &totalClues, Clue clue)
+* **Descrição:** Adiciona uma pista recém-descoberta ao inventário do jogador.
+* **Parâmetros:**
+  * `inventory[]`: O array que armazena as pistas.
+  * `&totalClues`: Referência para o contador de pistas no inventário.
+  * `clue`: O objeto `Clue` a ser adicionado.
+* **Retorno:** Nenhum.
 
-### Funções
-
-#### addInventory()
-
-* Adiciona pistas ao inventário.
-
-#### showInventory()
-
-* Exibe todas as pistas coletadas.
-
----
-
-## Sistema de Perguntas
-
-Cada pista possui:
-
-* descrição
-* pergunta investigativa
-* quatro alternativas
-* uma resposta correta
-
-A validação é feita pela função:
-
-### checkAnswer(Clue &pista)
-
-* **Descrição:** Verifica se o jogador respondeu corretamente.
-* **Retorno:** `true` ou `false`.
+#### showInventory(Clue inventory[], int totalClues)
+* **Descrição:** Exibe todas as pistas que o jogador já coletou.
+* **Parâmetros:**
+  * `inventory[]`: O array que armazena as pistas.
+  * `totalClues`: O número total de pistas no inventário.
+* **Retorno:** Nenhum.
 
 ---
 
-## Sistema de Dedução
+### Sistema de Perguntas
+* **Descrição:** Apresenta ao jogador um desafio de múltipla escolha para cada pista, validando a resposta para determinar se a pista foi "resolvida".
+* **Funções Associadas:** `checkAnswer()`.
 
-Após resolver pistas principais (`realClue == true`), o jogo:
+#### checkAnswer(Clue &pista)
+* **Descrição:** Apresenta uma pergunta de múltipla escolha ao jogador e verifica se a resposta está correta.
+* **Parâmetros:** `&pista` — Referência para a pista que está sendo investigada.
+* **Retorno:** `bool` — Retorna `true` se a resposta for correta, `false` caso contrário.
 
-* incrementa o progresso investigativo
-* exibe conexões do grafo
-* apresenta deduções narrativas de Holmes
+---
+
+### Sistema de Dedução
+* **Descrição:** Quando uma pista principal é resolvida, este sistema exibe a linha de raciocínio de Holmes, mostrando a conexão visual no grafo e uma dedução textual.
+* **Funções Associadas:** `showDeduction()`.
+
+#### investigateClue(TabelaHash &table, Grafo &graph, string key, Clue inventory[], int &totalClues, int &realCluesSolved)
+* **Descrição:** Orquestra a investigação de uma pista. Busca a pista na tabela hash, adiciona ao inventário, chama a verificação de resposta e, se for o caso, aciona o sistema de dedução.
+* **Parâmetros:**
+  * `&table`: Referência para a tabela hash de pistas.
+  * `&graph`: Referência para o grafo de investigação.
+  * `key`: Chave da pista a ser investigada.
+  * `inventory[]`: Array de pistas do inventário.
+  * `&totalClues`: Referência para o contador total de pistas.
+  * `&realCluesSolved`: Referência para o contador de pistas principais resolvidas.
+* **Retorno:** Nenhum.
+
+#### showDeduction(Grafo &graph, string clueKey)
+* **Descrição:** Exibe a linha de raciocínio de Holmes, mostrando a conexão visual no grafo e uma dedução textual associada à pista resolvida.
+* **Parâmetros:**
+  * `&graph`: Referência para o grafo de investigação.
+  * `clueKey`: A chave da pista que acionou a dedução.
+* **Retorno:** Nenhum.
 
 ---
 
@@ -287,8 +293,21 @@ Caso a acusação correta seja feita:
 | ------ | ------------------------------------- |
 | P4     | Lenço da esposa                       |
 | P5     | Cigarros do Mordomo                   |
+| P4     | Lenço ensanguentado e com ferrugem    |
+| P5     | Cigarros Turcos                       |
 | P6     | Discussão recente do filho mais velho |
 | P7     | Remédio antidepressivo                |
+| P8     | Traição                               |
+
+---
+
+## Pistas de Ambiente
+
+| Código | Título                |
+| ------ | --------------------- |
+| P9     | Cadeira Caída         |
+| P10    | Taça de Vinho Quebrada |
+| P11    | Sangue na Pia         |
 
 ---
 
@@ -342,27 +361,76 @@ Início
 
 ## IntroStory()
 
-Responsável pela introdução narrativa do jogo.
+* **Descrição:** Responsável pela introdução narrativa do jogo.
 
 ---
 
-## crimeScene()
+## crimeScene() 
 
-Exibe a cena inicial do crime.
+* **Descrição:** Exibe a cena inicial do crime.
 
 ---
 
-## interrogationScene()
+## Funções de Interação e Menus
 
-Executa todos os interrogatórios.
+#### menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved)
+* **Descrição:** Controla o menu principal do jogo, permitindo ao jogador escolher entre interrogar suspeitos ou investigar a cena do crime.
+* **Parâmetros:**
+  * `&table`: Referência para a tabela hash de pistas.
+  * `&graph`: Referência para o grafo de investigação.
+  * `inventory[]`: Array de pistas do inventário.
+  * `&totalClues`: Referência para o contador total de pistas.
+  * `&realCluesSolved`: Referência para o contador de pistas principais resolvidas.
+* **Retorno:** Nenhum.
+
+#### kitchenMenu(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved)
+* **Descrição:** Apresenta as opções de investigação na cozinha, permitindo ao jogador examinar diferentes objetos e pistas.
+* **Parâmetros:**
+  * `&table`: Referência para a tabela hash de pistas.
+  * `&graph`: Referência para o grafo de investigação.
+  * `inventory[]`: Array de pistas do inventário.
+  * `&totalClues`: Referência para o contador total de pistas.
+  * `&realCluesSolved`: Referência para o contador de pistas principais resolvidas.
+* **Retorno:** Nenhum.
+
+#### interrogationScene()
+* **Descrição:** Apresenta o menu para selecionar qual suspeito interrogar.
+* **Parâmetros:** Nenhum.
+* **Retorno:** Nenhum.
+
+#### Funções de Interrogatório
+* `eleanorInterrogation()`, `arthurInterrogation()`, `edwardInterrogation()`, `violetInterrogation()`, `alfredInterrogation()`
+* **Descrição:** Cada uma dessas funções é responsável por gerenciar o diálogo e as perguntas para um suspeito específico.
+* **Parâmetros:** Nenhum.
+* **Retorno:** Nenhum.
+
+---
+
+## Funções de Configuração
+
+#### createClues(TabelaHash &table)
+* **Descrição:** Inicializa todas as pistas do jogo (principais, falsas e de ambiente) e as insere na tabela hash.
+* **Parâmetros:** `&table` — Referência para a tabela hash a ser populada.
+* **Retorno:** Nenhum.
+
+#### createConnectionsClue(Grafo &graph)
+* **Descrição:** Cria os nós no grafo de investigação e estabelece as conexões lógicas entre as pistas.
+* **Parâmetros:** `&graph` — Referência para o grafo a ser configurado.
+* **Retorno:** Nenhum.
 
 ---
 
 # Final do Jogo
 
-## bestEnding()
+#### accusationMenu()
+* **Descrição:** Função chamada quando o jogador decide fazer uma acusação. Verifica se a escolha do jogador está correta e direciona para o final correspondente.
+* **Parâmetros:** Nenhum.
+* **Retorno:** Nenhum.
 
-Exibe o final verdadeiro quando o jogador acusa corretamente Violet.
+#### bestEnding()
+* **Descrição:** Exibe a narrativa do final verdadeiro, onde Sherlock revela o assassino e suas motivações.
+* **Parâmetros:** Nenhum.
+* **Retorno:** Nenhum.
 
 ---
 
