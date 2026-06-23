@@ -184,3 +184,123 @@ Todos os personagens possuem os dois nós obrigatórios: `perguntar_relacao` e `
 		- Ponto de Conexão 1: Violet afirma ter derrubado a taça e limpado o local muito antes do crime. Contudo, a taça foi encontrada caída no centro da cena, vertendo sangue e vinho ainda frescos sobre o mármore, o que contradiz a linha do tempo dela. 
 		- Ponto de Conexão 2: Ela alega ter usado o lenço da mãe apenas para limpar vinho. No entanto, o lenço foi encontrado ensanguentado e com marcas de ferrugem pesada — ferrugem esta que Edward afirma ter deixado no lenço ao forçar o portão de ferro do jardim.
 		- Ponto de Conexão 3: O assassino usou o lenço para manipular a faca ou o portão sem deixar digitais, e o cheiro de lavanda nas mãos de Violet coincide perfeitamente com o odor residual encontrado na pia onde o sangue foi lavado. 
+
+
+# TABELA DE PISTAS POR PERSONAGEM
+
+### Eleanor Whitmore (Esposa)
+
+| Nome da Pista | Tipo | Título | Descrição Resumida |
+|---------------|------|--------|-------------------|
+| `lenco_ensanguentado` | `realClue = false` | Lenço Ensanguentado com Ferrugem | Lenço com monograma "E.W." encontrado na cena com sangue e ferrugem. Pertence a Eleanor, mas a ferrugem veio de Edward e o sangue de Violet. |
+| `suspeita_traicao` | `realClue = false` | Suspeita de Traição | Eleanor suspeitava que Raymond a traía há meses — motivo passional, mas não a levou ao crime. |
+| `sintomas_eleanor` | `realClue = false` | Sintomas Suspeitos de Eleanor | Agitação nos pés, espasmos e sonolência indicam abuso de antidepressivos, não sedativos como ela afirma. |
+| `alibi_eleanor` | `realClue = false` | Álibi de Eleanor | Disse estar no quarto com sedativos, mas admitiu ter ido à cozinha roubar os remédios de Edward. Raymond ainda estava vivo. |
+| `frasco_antidepressivo` | `realClue = false` | Frasco de Antidepressivo no Lixo | Frasco de Edward encontrado vazio no lixo da cozinha. Eleanor confessou tê-lo roubado e consumido. |
+
+**Resumo Eleanor:** 5 pistas — Todas são Red Herrings. Nenhuma prova seu envolvimento direto no assassinato.
+
+---
+
+### Arthur Whitmore (Filho Mais Velho)
+
+| Nome da Pista | Tipo | Título | Descrição Resumida |
+|---------------|------|--------|-------------------|
+| `discussao_arthur` | `realClue = false` | Discussão Recente com o Filho Mais Velho | Briga violenta com o pai na manhã do crime sobre aposentadoria e exclusão da linha de sucessão. Motivo forte, mas não matou. |
+| `testamento_sucessao` | `realClue = false` | Testamento e Linha de Sucessão | Ao ser perguntado sobre testamento, Arthur travou e encarou a mãe com indagação. Sugere segredo compartilhado com Eleanor. |
+
+**Resumo Arthur:** 2 pistas — Ambas são Red Herrings. Motivo financeiro forte, mas o ângulo da facada e a cena forjada o inocentam fisicamente.
+
+---
+
+### Edward Whitmore (Filho do Meio)
+
+| Nome da Pista | Tipo | Título | Descrição Resumida |
+|---------------|------|--------|-------------------|
+| `cigarros_turcos` | `realClue = false` | Cigarros Turcos na Cozinha | Bituca de cigarro turco de baunilha encontrada na cozinha. Edward fuma esse tipo, mas a bituca foi plantada para incriminá-lo. |
+| `dedos_amarelados` | `realClue = false` | Dedos Amarelados de Fumante | Dedos de Edward têm marcas de fumante compulsivo. Ele mentiu dizendo que ninguém fuma na família. |
+| `cinzeiro_jardim` | `realClue = true` | Cinzeiro no Jardim | Edward acredita que alguém pegou a bituca do cinzeiro externo e plantou na cozinha para incriminá-lo. |
+| `alibi_edward` | `realClue = true` | Álibi de Edward | Disse estar no jardim, mas admitiu ter entrado na cozinha para pegar gelo. Ouviu passos de mulher e fugiu. |
+| `portao_ferro` | `realClue = true` | Portão de Ferro Emperrado | Edward usou o lenço de Eleanor para forçar o portão de ferro emperrado do jardim, explicando a ferrugem no lenço. |
+| `frasco_antidepressivo` | `realClue = false` | Frasco de Antidepressivo no Lixo | O frasco é de Edward, mas sumiu do seu quarto dois dias antes. Eleanor roubou e consumiu o conteúdo. |
+
+**Resumo Edward:** 6 pistas — 3 verdadeiras e 3 falsas. É o bode expiatório: foi incriminado com cigarro plantado e frasco roubado, mas suas pistas verdadeiras ajudam a inocentá-lo e apontar para Violet.
+
+---
+
+### Violet Whitmore (Filha Caçula) — **A ASSASSINA**
+
+| Nome da Pista | Tipo | Título | Descrição Resumida |
+|---------------|------|--------|-------------------|
+| `faca_crime` | `realClue = true` | Faca do Crime | A faca foi limpa parcialmente. Violet tentou remover digitais, mas esqueceu ranhuras próximas ao cabo. |
+| `angulo_facada` | `realClue = true` | Ângulo da Facada | Ângulo descendente: assassino mais baixo que a vítima ou golpe pelas costas com vítima sentada. Compatível com Violet. |
+| `microfissuras_cabo` | `realClue = true` | Microfissuras no Cabo | Força excessiva por tensão extrema e adrenalina. Crime passional — compatível com o estado emocional de Violet. |
+| `cadeira_caida` | `realClue = true` | Cadeira Caída | Colocada propositalmente para forjar briga corporal. Violet tentou esconder que o ataque foi covarde. |
+| `taca_vinho` | `realClue = true` | Taça de Vinho Quebrada | Apenas UMA taça — vítima bebia sozinha. Contradiz Violet, que disse ter bebido com ele. |
+| `sangue_pia` | `realClue = true` | Sangue na Pia | Alguém lavou as mãos após o crime. O cheiro de lavanda conecta a pia a Violet. |
+| `cheiro_lavanda` | `realClue = true` | Cheiro de Lavanda na Pia | Perfume de lavanda na pia coincide com o cheiro das mãos de Violet. |
+| `fones_ouvido` | `realClue = true` | Fones de Ouvido de Violet | Violet diz que usava fones no quarto, mas passos de mulher foram ouvidos no corredor. Contradição no álibi. |
+| `frieza_violet` | `realClue = true` | Frieza Emocional de Violet | Responde rápido, sorriso simétrico, olhos frios. Diz sentir tristeza, mas não demonstra luto genuíno. |
+| `perdeu_medo` | `realClue = true` | "Alguém Finalmente Perdeu o Medo Dele" | Frase crucial dita por Violet. Soa como confissão velada — alívio, não choque. |
+| `adrenalina_violet` | `realClue = true` | Tensão e Adrenalina em Violet | Mãos tensas indicam esforço físico recente. Compatível com cravar uma faca com força obsessiva. |
+| `vinho_unhas` | `realClue = true` | Vinho e Sangue nas Unhas de Violet | Crostas arroxeadas de vinho nas unhas, mancha na manga, cheiro de uva fermentada. Conexão direta com a cena. |
+| `alibi_violet` | `realClue = true` | Álibi de Violet | Álibi contradito por passos no corredor, vinho nas unhas, cheiro de lavanda e ausência de luto. |
+| `tirano_domestico` | `realClue = true` | "Tirano Doméstico" | Violet revela verdadeira opinião: pai esmagava a individualidade de todos. Contradiz "relação maravilhosa". |
+| `karma_violet` | `realClue = true` | "Foi Apenas o Karma Dele" | Racionaliza o assassinato como merecido. Falta de indignação moral contra o assassino. |
+| `passos_leves` | `realClue = true` | Passos Leves no Corredor | Passos ouvidos por Edward e Alfred: "leves demais para homem". Apontam para Violet. |
+| `lenco_ensanguentado` | `realClue = false` | Lenço Ensanguentado com Ferrugem | Violet usou o lenço da mãe para manipular a faca sem deixar digitais. |
+| `cigarros_turcos` | `realClue = false` | Cigarros Turcos na Cozinha | Violet pegou a bituca do cinzeiro de Edward e plantou na cozinha para incriminá-lo. |
+
+**Resumo Violet:** 18 pistas — 16 verdadeiras e 2 falsas usadas por ela para incriminar outros. Todas as evidências físicas, comportamentais e psicológicas convergem para ela.
+
+---
+
+### Alfred (Mordomo)
+
+| Nome da Pista | Tipo | Título | Descrição Resumida |
+|---------------|------|--------|-------------------|
+| `mordomo_invisivel` | `realClue = false` | Mordomo Invisível | Tratado "como mobília" por 40 anos. Ressentimento profundo, mas sem evidência física na cena. |
+| `cachimbo_alfred` | `realClue = false` | Cachimbo Velho do Mordomo | Cheiro de fumo é de cachimbo barato, não dos cigarros turcos de luxo da cena. Inocenta Alfred. |
+| `passos_leves` | `realClue = true` | Passos Leves no Corredor | Testemunha chave: ouviu "passos rápidos e leves demais para serem de um homem". Aponta para mulher. |
+
+**Resumo Alfred:** 3 pistas — 2 falsas e 1 verdadeira. Testemunha crucial, não suspeito. Seu depoimento sobre os passos é peça-chave contra Violet.
+
+---
+
+## RESUMO GERAL POR PERSONAGEM
+
+| Personagem | Total de Pistas | `realClue = true` | `realClue = false` | Papel no Crime |
+|------------|-----------------|-------------------|--------------------|----------------|
+| **Violet Whitmore** | 18 | 16 | 2 | **Assassina** |
+| **Edward Whitmore** | 6 | 3 | 3 | Bode expiatório |
+| **Eleanor Whitmore** | 5 | 0 | 5 | Cúmplice passiva |
+| **Arthur Whitmore** | 2 | 0 | 2 | Inocente com motivo |
+| **Alfred** | 3 | 1 | 2 | Testemunha chave |
+
+---
+
+## PISTAS CRUZADAS (Aparecem em mais de um personagem)
+
+| Nome da Pista | Personagens Relacionados | Explicação |
+|---------------|--------------------------|------------|
+| `lenco_ensanguentado` | Eleanor + Edward + Violet | Eleanor: dona do lenço. Edward: usou no portão (ferrugem). Violet: usou na cena (sangue). |
+| `cigarros_turcos` | Edward + Violet | Edward: dono dos cigarros. Violet: plantou a bituca na cozinha. |
+| `frasco_antidepressivo` | Eleanor + Edward | Edward: dono do frasco. Eleanor: roubou e consumiu. |
+| `passos_leves` | Violet + Edward + Alfred | Violet: quem andava no corredor. Edward: ouviu e fugiu. Alfred: ouviu e testemunhou. |
+
+---
+
+## PARA O SISTEMA DE ACUSAÇÃO
+
+O jogador precisa resolver **pelo menos 3 pistas principais** para acusar. As pistas que diretamente incriminam Violet são:
+
+| Prioridade | Nome da Pista | Por que é crucial |
+|------------|---------------|-------------------|
+| ★★★ | `perdeu_medo` | Confissão velada — a frase mais reveladora |
+| ★★★ | `vinho_unhas` | Evidência física direta na pessoa de Violet |
+| ★★★ | `angulo_facada` | Elimina Arthur e Alfred, aponta para mulher mais baixa |
+| ★★☆ | `cheiro_lavanda` | Conecta Violet diretamente à pia onde o assassino se limpou |
+| ★★☆ | `taca_vinho` | Contradiz a mentira de Violet sobre beber com o pai |
+| ★★☆ | `frieza_violet` | Ausência de luto genuíno |
+| ★☆☆ | `passos_leves` | Testemunhas apontam para mulher no corredor |
+| ★☆☆ | `microfissuras_cabo` | Crime passional — compatível com Violet |

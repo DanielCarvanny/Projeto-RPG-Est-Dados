@@ -1623,7 +1623,7 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
     cout << "9. Analisar fisico da vitima" << endl;
     cout << " 10. Ver Inventario" << endl;
     cout << " 0. Se retirar" << endl;
-
+    cout << "Opcao: ";
     cin >> op;
     cin.ignore();
       
@@ -1634,18 +1634,19 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
         cout << "2. Examinar angulo do golpe" << endl;
         cout << "3. Examinar cabo da faca" << endl;
         cout << "0. Voltar" << endl;
+        cout << "Opcao: ";
         cin >> sub_op;
         cin.ignore();
 
         switch(sub_op) {
             case 1:
-                investigateClue(table, graph, "P1", inventory, totalClues, realCluesSolved); 
+                investigateClue(table, graph, "faca_crime", inventory, totalClues, realCluesSolved); 
                 break;
             case 2:
                 investigateClue(table, graph, "angulo_facada", inventory, totalClues, realCluesSolved);
                 break;
             case 3:
-                investigateClue(table, graph, "P3", inventory, totalClues, realCluesSolved);
+                investigateClue(table, graph, "microfissuras_cabo", inventory, totalClues, realCluesSolved);
                 break;
             case 0:
                 break; // Volta ao menu da cozinha
@@ -1658,16 +1659,36 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
         investigateClue(table, graph, "cadeira_caida", inventory, totalClues, realCluesSolved);
         break;
       case 3:
-        investigateClue(table, graph, "P10", inventory, totalClues, realCluesSolved);
+        investigateClue(table, graph, "taca_vinho", inventory, totalClues, realCluesSolved);
         break;
-      case 4:
-        investigateClue(table, graph, "P11", inventory, totalClues, realCluesSolved);
+      case 4: {
+        cout << "\nAnalisando a pia..." << endl;
+        cout << "1. Examinar padrao de sangue" << endl;
+        cout << "2. Examinar odor no local" << endl;
+        cout << "0. Voltar" << endl;
+        cout << "Opcao: ";
+        cin >> sub_op;
+        cin.ignore();
+
+        switch(sub_op) {
+            case 1:
+                investigateClue(table, graph, "sangue_pia", inventory, totalClues, realCluesSolved);
+                break;
+            case 2:
+                investigateClue(table, graph, "cheiro_lavanda", inventory, totalClues, realCluesSolved);
+                break;
+            case 0:
+                break; // Volta ao menu
+            default:
+                cout << "Opcao invalida." << endl;
+        }
         break;
+      }
       case 5:
         investigateClue(table, graph, "lenco_ensanguentado", inventory, totalClues, realCluesSolved);
         break;
       case 6:
-        investigateClue(table, graph, "P5", inventory, totalClues, realCluesSolved);
+        investigateClue(table, graph, "cigarros_turcos", inventory, totalClues, realCluesSolved);
         break;
       case 7:
         investigateClue(table, graph, "frasco_antidepressivo", inventory, totalClues, realCluesSolved);
@@ -1677,7 +1698,20 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
       break;
       case 9:
         cout << endl << "=== VITIMA -- RAYMOND WHITMORE ===" << endl;
-        cout << "Altura: 1,82m | Porte: Robusto e imponente | Olhos: Castanho-escuros | Cabelo: Grisalho" << endl;
+        cout << "=== Caracteristicas ===" << endl;
+        cout << "Altura: 1,82m (Alto)" << endl;
+        cout << "Porte: Robusto, ombros largos, presenca imponente" << endl;
+        cout << "Olhos: Castanho-escuros" << endl;
+        cout << "Cabelo: Grisalho, ralo no topo, penteado para tras" << endl;
+        cout << "Caracteristica distintiva: Anel de sinete de ouro com o brasao da familia no" << endl;
+        cout << "  mindinho direito. Pequena cicatriz na sobrancelha direita de uma queda de" << endl;
+        cout << "  cavalo na juventude. Maos grandes com calos nas pontas dos dedos de tanto" << endl;
+        cout << "  assinar documentos." << endl;
+        cout << "Vestimenta: Camisa social branca de algodao egipcio (agora ensanguentada)," << endl;
+        cout << "  mangas dobradas ate os cotovelos. Calcas de alfaiataria cinza-escuro." << endl;
+        cout << "  Sapatos de couro marrom. Paleto dobrado sobre uma cadeira proxima." << endl;
+        cout << "  Relogio de bolso de ouro marcando 22:17." << endl;
+
         cout << "\nPara prosseguir aperte Enter..." << endl;
         pausa();
         
