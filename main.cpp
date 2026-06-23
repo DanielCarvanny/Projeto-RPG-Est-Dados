@@ -37,7 +37,7 @@ struct Clue { //Estrutura da Pista
 };
 
 //---------------[Auxiliar]---------------
-void next(){ //Função pra pausa
+void pausa(){ //Funcao pra pausa
 
     string continuar;
     getline(cin, continuar);
@@ -61,7 +61,7 @@ class TabelaHash{
       bool guilty;
     };
 
-    int funcaoHash(string key) { //Pega o valor em ASCII e cria uma chave a partir do número feito, ou seja, pega o ascii de "P1"
+    int funcaoHash(string key) { //Pega o valor em ASCII e cria uma chave a partir do numero feito, ou seja, pega o ascii de "P1"
       unsigned int sum = 0;
 
       for (int i = 0; i < key.size(); i++) {
@@ -177,7 +177,7 @@ class Grafo{
     void dfsRaciocinio(No* atual, bool visitados[], TabelaHash &table){ //Busca em Profundidade
       if(atual == NULL) return;
 
-      int index = -1;//Achando index do nó e marcar como visitado.
+      int index = -1;//Achando index do no e marcar como visitado.
       for(int i = 0; i < numVertices; i++){
         if(vertices[i] == atual){
           index = i;
@@ -185,7 +185,7 @@ class Grafo{
         }
       }
 
-      //Não encontrou ou já foi visitado.
+      //Nao encontrou ou ja foi visitado.
       if(index == -1 || visitados[index]) return;
 
       visitados[index] = true;
@@ -197,8 +197,8 @@ class Grafo{
         cout << " -> " << atual->idClue;
 
         if(clueGame.resolvida){
-          cout << "(Concluída)";
-        } else{ //Fim raciocínio.
+          cout << "(Concluida)";
+        } else{ //Fim raciocinio.
           cout << " (Pendente de analise)";
           return;
         }
@@ -209,26 +209,26 @@ class Grafo{
       }
     };
   public:
-    No* addNo(string idClue, int nivel){ //Criação do nó(Níveis)
+    No* addNo(string idClue, int nivel){ //Criacao do no(Niveis)
 
       No* newNo = new No;
       newNo->idClue = idClue;
       newNo->nivel = nivel;
       newNo->numConnections = 0; 
 
-      for(int i = 0; i < MAX_VERTICES; i++){ //Colocando conexões nulas
+      for(int i = 0; i < MAX_VERTICES; i++){ //Colocando conexoes nulas
         newNo->connection[i] = NULL;
       }
 
-      if(numVertices < MAX_VERTICES){ //Adicionando Nó criado no vetor de nível
+      if(numVertices < MAX_VERTICES){ //Adicionando No criado no vetor de nivel
         vertices[numVertices] = newNo; 
         numVertices++;
       }
 
-      return newNo; //Retornando Nó criado
+      return newNo; //Retornando No criado
     }
 
-    void addConnections(int v1, int v2) { //Adicionando conexões
+    void addConnections(int v1, int v2) { //Adicionando conexoes
       
       if(v1 < MAX_VERTICES && v2 < MAX_VERTICES){
         No* original = vertices[v1];
@@ -240,10 +240,10 @@ class Grafo{
       }
     }
     
-    void showConnections(int v){ //Exibindo coneções 
+    void showConnections(int v){ //Exibindo conecoes 
         No* present = vertices[v];
         
-        cout << "Ligações entre as pistas:"<< present->idClue << endl;
+        cout << "Ligacoes entre as pistas:"<< present->idClue << endl;
         
         for(int i = 0; i < present-> numConnections; i++){
             cout<< present->connection[i]->idClue << endl;
@@ -251,7 +251,7 @@ class Grafo{
     }
     
     //AVALIAR:
-    //A description das pistas precisam ser exatamente a dedução que Sherlock fará 
+    //A description das pistas precisam ser exatamente a deducao que Sherlock fara 
     //(ex: "A faca foi parcialmente limpa, sugerindo tentativa de ocultar o crime.").
     void showReasoningLine(string clueKey, TabelaHash &table){
       bool visitados[MAX_VERTICES] = {false};
@@ -274,7 +274,7 @@ class Grafo{
 
 void showDeduction(Grafo &graph, TabelaHash& table, string clueKey);
 
-//---------------[Inventário]---------------
+//---------------[Inventario]---------------
 void addInventory(Clue inventory[],int &totalClues,Clue clue){
   inventory[totalClues] = clue;
   totalClues++;
@@ -363,67 +363,75 @@ void investigateClue(TabelaHash &table, Grafo &graph, string key, Clue inventory
   }
 }
 
-//---------------[História]---------------
+//---------------[Historia]---------------
 void introStory(){
+  limparTela();
   cout << "===== INVESTIGACAO POLICIAL =====" << endl;
-  next();
 
-  cout << "Londres -- 15 de Janeiro de 2010, 22:20" << endl; //Nenhuma alteração necessária
+  cout << "Londres -- 15 de Janeiro de 2010, 22:20" << endl; //Nenhuma alteracao necessaria
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout << "A chuva fina castigava as ruas de Londres, a nevoa envolvia os postes de luz, transformando o brilho amarelado em manchas fantasmagoricas no asfalto molhado." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
-  cout << "Dentro de um táxi escuro, Sherlock Holmes observava silenciosamente o lado de fora enquanto John Watson terminava de vestir suas luvas." << endl;
+  cout << "Dentro de um taxi escuro, Sherlock Holmes observava silenciosamente o lado de fora enquanto John Watson terminava de vestir suas luvas." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
-
+  pausa();
+  limparTela();
+  
   cout << "O veiculo desacelera." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "A frente, uma enorme residencia vitoriana cercada por grades negras emerge da neblina." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout<<"Luzes policiais iluminam a fachada.\nDuas viaturas.\nUma ambulancia."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout<<"Assim que descem do carro, um policial os aguarda proximo a entrada principal."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
-  cout<<"Ele estende a mão."<<endl;
+  cout<<"Ele estende a mao."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout<<"=== Policial ==="<<endl;
   cout<<"-- Boa noite, Detetive Holmes e Doutor Watson, sou o inspetor William Carter."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout<<"=== Inspetor Carter ==="<<endl;
   cout<<"-- O patriarca da familia foi brutalmente assassinado ha cerca de uma hora."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout<<"=== Inspetor Carter ==="<<endl;
   cout<<"-- Nao encontramos sinais de arrombamento. Nenhuma testemunha. Nenhuma pista concreta."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout<<"=== Inspetor Carter ==="<<endl;
   cout<<"-- Mas quem fez isso... sabia exatamente o que estava fazendo."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout<<"=== Inspetor Carter ==="<<endl;
   cout<<"-- Os familiares estao reunidos na sala de estar. Ninguem saiu da casa desde nossa chegada. O corpo esta na cozinha."<<endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
   limparTela();
 
 }
@@ -432,685 +440,1066 @@ void crimeScene(){
 
   cout << "Ao entrarem, o cheiro metalico do sangue domina imediatamente o ambiente." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout << "A cozinha luxuosa parece congelada no tempo." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout << "No centro da cozinha..." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "o corpo." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout << "Um homem de meia idade, elegante, caido ao lado da ilha central." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "A camisa social branca esta completamente tingida de vermelho." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "Uma faca de cozinha permanece cravada em seu peito." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout << "Ao redor do corpo:" << endl;
   cout << "sangue." << endl;
   cout << "Pegadas borradas." << endl;
   cout << "Marcas de luta." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout << "Watson se aproxima lentamente." << endl;
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
+  limparTela();
   
   cout<<"=== Watson ==="<<endl;
   cout << "-- Meu Deus..." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
+  limparTela();
 
   cout << "Sherlock permanece em silencio. Observando. Calculando." << endl;
   cout << "Para prosseguir apere Enter" << endl;
-  next();
+  pausa();
   
   cout<<"=== Sherlock ==="<<endl;
   cout << "-- Vamos conversar um pouco com nossos suspeitos..." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
   limparTela();
   
 }
 
-//---------------[Interrogatórios]---------------
-// ===============[Interrogatório Eleanor]==============
+//---------------[Interrogatorios]---------------
+// ===============[Interrogatorio Eleanor]==============
 void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
-  Clue suspeita_traicao = table.search("suspeita_traicao");
-  Clue lenco_ensanguentado = table.search("lenco_ensanguentado");
-  Clue frasco_antidepressivo = table.search("frasco_antidepressivo");
-  Clue sintomas_eleanor = table.search("sintomas_eleanor");
-
-  int op = -1;
+  int op = -1, op2 = -1;
   do{
-    // Adicionar as análise de comportamento e características físicas
-    cout << endl << "=== A ESPOSA -- ELEANOR WHITMORE ===" << endl;
-    cout <<"=== Características ==="<<endl;
-    cout << "Elegante." << endl;
-    cout << "Olhos cansados." << endl;
-    cout << "Maos tremulas.\n" << endl;
-    
-    cout<< "Ela apresenta uma agitacao extrema nos pes; Espasmos musculares e uma forte sonolência incapacitante. Isso pode indicar uso de remédios antidepressivos." <<endl;
-    investigateClue(table, graph, "sintomas_eleanor", inventory, totalClues, realCluesSolved); 
-
-    
-    cout << "\nPara prosseguir aperte Enter..." << endl;
-    next();
-
-    // Perguntas
-    cout << "Perguntas:" << endl;
-    cout<<" 1. Como era sua relacao com seu marido?" << endl; 
-    cout <<" 2. Onde estava durante o assassinato?" << endl;
-    if(suspeita_traicao.descoberta){
-      cout <<" 3. A senhora suspeitava de traicao?" << endl;
-    }
-    if(lenco_ensanguentado.descoberta){
-      cout <<" 4. Por que seu lenço estava ensanguentado e com marcas de ferrugem pesada na cozinha?" << endl;
-    }
-    if(frasco_antidepressivo.descoberta && sintomas_eleanor.descoberta){
-      cout <<" 5. Encontramos o frasco de manipulação do seu filho Edward no lixo da cozinha. Estava vazio, alguém andou consumindo ele, e não era o seu filho. \nVocê sabe de algo sobre o frasco?" << endl;
-    }
-    cout<<" 0. Se retirar"<<endl;
-    cin>>op;
+    cout << endl << "=== ESPOSA -- ELEANOR WHITMORE ===" << endl;
+    cout << "Altura: 1,65m | Porte: Esguio | Olhos: Castanhos | Cabelo: Castanho com grisalho\n" << endl;
+    cout<<"1. Avaliacao fisica"<<endl;
+    cout<<"2. Perguntas"<<endl;
+    cout<<"0. Se retirar"<<endl;
+    cout<<"Opcao: ";
+    cin>>op2;
     cin.ignore();
-
-    switch(op){
-      case 1:
-        limparTela();
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- Distante... ultimamente muito distante." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- Ele nao ficava em casa." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- Vivia voltando tarde do trabalho." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Ela evita olhar diretamente para Holmes, projetando uma postura defensiva que esconde um ressentimento profundo." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-
-        investigateClue(table, graph, "suspeita_traicao", inventory, totalClues, realCluesSolved);
-      break;
     
-      case 2:
-        limparTela();
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- No meu quarto." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- Estou enfrentando insonia recentemente." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- Tenho tomado remedios para dormir." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "alibi_eleanor", inventory, totalClues, realCluesSolved); 
-      break;
-      
-      case 3:
-        limparTela();
-        cout << "Ela demora alguns segundos para responder." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- Um pouco." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-
-        cout<<"=== ELEANOR WHITMORE ==="<<endl;
-        cout << "-- Uma intuição que me corroía há meses, detetive." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-
-        cout << "Ela projeta um olhar arrependido." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-      break;
-
-      case 4:
-        // Adicionar conversa
-      break;
-
-      case 5:
-        // Adicionar conversa
-      break;
-      
-      case 0:
-        cout<<"=== Sherlock Holmes ==="<<endl;
-        cout<<"-- Tudo bem."<<endl;
-      break;
-
-      default:
-        cout<<"Opcao invalida"<<endl;
-        cout<<"Tente novamente"<<endl;
-      break;
+    if(op2 == 1){
+      cout << "=== Caracteristicas ===" << endl;
+      cout << "Altura: 1,65m (Mediana)" << endl;
+      cout << "Porte: Esguio, levemente curvado pelos anos" << endl;
+      cout << "Olhos: Castanhos, evitam contato direto" << endl;
+      cout << "Cabelo: Castanho com fios grisalhos, preso em um coque baixo e elegante" << endl;
+      cout << "Caracteristica distintiva: Agitacao involuntaria nos pes. Espasmos musculares" << endl;
+      cout << "  ocasionais nos dedos. Sonolencia pesada nas palpebras que tenta disfarcar." << endl;
+      cout << "Vestimenta: Vestido de seda azul-escuro ate os tornozelos, gola alta. Colar de" << endl;
+      cout << "  perolas simples no pescoco. Anel de casamento de ouro ja gasto pelo tempo.\n" << endl;
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
+      investigateClue(table, graph, "sintomas_eleanor", inventory, totalClues, realCluesSolved); 
     }
-  }while(op!=0);
+    else if(op2!=0 && op2!=1 && op2!=2){
+      cout<<"Opcao invalida"<<endl;
+      cout<<"Tente novamente"<<endl;
+    }
+    else if(op2 == 2){
+      do{
+        Clue suspeita_traicao = table.search("suspeita_traicao");
+        Clue lenco_ensanguentado = table.search("lenco_ensanguentado");
+        Clue frasco_antidepressivo = table.search("frasco_antidepressivo");
+        Clue sintomas_eleanor = table.search("sintomas_eleanor");
+        // Perguntas
+        cout << "=== Perguntas ===" << endl;
+        cout<<" 1. Como era sua relacao com seu marido?" << endl; 
+        cout <<" 2. Onde estava durante o assassinato?" << endl;
+        if(suspeita_traicao.descoberta){
+          cout <<" 3. A senhora suspeitava de traicao?" << endl;
+        }
+        if(lenco_ensanguentado.descoberta){
+          cout <<" 4. Por que seu lenco estava ensanguentado e com marcas de ferrugem pesada na cozinha?" << endl;
+        }
+        if(frasco_antidepressivo.descoberta && sintomas_eleanor.descoberta){
+          cout <<" 5. Encontramos o frasco de manipulacao do seu filho Edward no lixo da cozinha. Estava vazio, alguem andou consumindo ele, e nao era o seu filho. \nVoce sabe de algo sobre o frasco?" << endl;
+        }
+        cout<<" 0. Se retirar"<<endl;
+        cout<<"Opcao: ";
+        cin>>op;
+        cin.ignore();
+
+        switch(op){
+          case 1:
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Distante... ultimamente muito distante." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Ele nao ficava em casa." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Vivia voltando tarde do trabalho." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout << "Ela evita olhar diretamente para Holmes, projetando uma postura defensiva que esconde um ressentimento profundo." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+
+            investigateClue(table, graph, "suspeita_traicao", inventory, totalClues, realCluesSolved);
+          break;
+        
+          case 2:
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- No meu quarto." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Estou enfrentando insonia recentemente." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Tenho tomado remedios para dormir." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "alibi_eleanor", inventory, totalClues, realCluesSolved); 
+          break;
+          
+          case 3:
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "Ela demora alguns segundos para responder." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Um pouco." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Uma intuicao que me corroia ha meses, detetive." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "Ela projeta um olhar arrependido." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+
+          case 4:
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- Senhora Whitmore, encontramos este lenco com suas iniciais, E.W., na cena do crime." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- Ele possui uma mancha inconfundivel de ferrugem e um rastro de sangue da vitima. Como explica isso?" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "Ela parece genuinamente surpresa por um instante." << endl;
+            cout << "-- Meu lenco? Mas detetive... eu perdi esse lenco especifico no nosso jardim ha pelo menos dois dias!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Alguem deve te-lo pego. Jamais o vi com ferrugem!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+
+          case 5:
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- Seus tremores intensos... e esse frasco vazio de manipulacao do seu filho Edward que encontramos no lixo." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- A senhora diz tomar sedativos leves, mas este forte antidepressivo esta vazio. Foi a senhora que o consumiu, nao foi?" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "Eleanor desaba, colocando as maos no rosto e desatando a chorar." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Sim! Fui eu! A ansiedade estava me devorando viva por causa daquele homem!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Eu desci ate a cozinha para roubar os remedios do meu filho." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- E seu marido estava morto quando desceu?" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ELEANOR WHITMORE ==="<<endl;
+            cout << "-- Nao... ele estava la, vivo. Bebendo seu vinho. Peguei os remedios escondida e fugi de volta para meu quarto." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "alibi_eleanor", inventory, totalClues, realCluesSolved);
+          break;
+          
+          case 0:
+            cout<<"=== Sherlock Holmes ==="<<endl;
+            cout<<"-- Tudo bem."<<endl;
+          break;
+
+          default:
+            cout<<"Opcao invalida"<<endl;
+            cout<<"Tente novamente"<<endl;
+          break;
+        }
+      }while(op!=0);
+    }
+  }while(op2!=0);
 }
 
-// ===============[Interrogatório Arthur]==============
+// ===============[Interrogatorio Arthur]==============
 void arthurInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
-  Clue discussao_arthur = table.search("discussao_arthur");
-  Clue angulo_facada = table.search("angulo_facada");
-  Clue cadeira_caida = table.search("cadeira_caida");
-  Clue testamento_sucessao = table.search("testamento_sucessao");
+  // As clues foram movidas para dentro do laco de perguntas
 
   // Criar uma pista para o Alibi dele
   
-  int op = -1;
+  int op = -1, op2 = -1;
   int continuacao = 0;
   do{
-    // Adicionar as análise de comportamento e características físicas
     cout << endl << "=== FILHO MAIS VELHO -- ARTHUR WHITMORE ===" << endl;
-    cout<<"=== Características ==="<<endl;
-    cout << "Controlado." << endl;
-    cout << "Ambicioso." << endl;
-    cout << "Frio.\n" << endl;
-
-    cout << "Perguntas:" << endl;
-    cout<<" 1. Como era sua relacao com seu pai?" << endl; 
-    cout <<" 2. Onde estava durante o assassinato?" << endl;
-    if(discussao_arthur.descoberta){
-      cout<<" 3. Voces discutiram hoje?" << endl;
-      
-      if(continuacao == 0){continuacao = 1;}
-    }
-    if(continuacao == 1){
-      cout<<" 4. Voce queria assumir a empresa??" << endl;
-    }
-    if(angulo_facada.descoberta && cadeira_caida.descoberta){
-      // Adicionar pergunta sobre a cena do crime, como o ângulo da facada e a cadeira caída
-      cout<<" 5. " << endl;
-    }
-    if(testamento_sucessao.descoberta){
-      cout<<" 6. Seu pai pretendia mudar o testamento?" << endl;
-    }
-    cout<<" 0. Se retirar"<<endl;
-    cin>>op;
+    cout << "Altura: 1,85m | Porte: Atletico | Olhos: Azuis | Cabelo: Castanho-escuro\n" << endl;
+    cout<<"1. Avaliacao fisica"<<endl;
+    cout<<"2. Perguntas"<<endl;
+    cout<<"0. Se retirar"<<endl;
+    cout<<"Opcao: ";
+    cin>>op2;
     cin.ignore();
 
-    switch(op){
-      case 1:
-        // Adicionar conversa sobre a relação com o pai
-         limparTela();
-      break;
+    if(op2 == 1){
+      cout << "=== Caracteristicas ===" << endl;
+      cout << "Altura: 1,85m (Alto)" << endl;
+      cout << "Porte: Atletico, ombros largos, postura ereta e imponente" << endl;
+      cout << "Olhos: Azuis penetrantes, raramente piscam durante uma conversa" << endl;
+      cout << "Cabelo: Castanho-escuro, penteado para tras com precisao, sem um fio fora do lugar" << endl;
+      cout << "Caracteristica distintiva: A veia na tempora direita pulsa visivelmente quando" << endl;
+      cout << "  se exalta. Os bracos permanecem cruzados. Os punhos se apertam contra os" << endl;
+      cout << "  lados do corpo quando o nome do pai e mencionado." << endl;
+      cout << "Vestimenta: Terno cinza-escuro de corte impecavel. Camisa branca com abotoaduras" << endl;
+      cout << "  de prata. Sapatos de couro italiano perfeitamente engraxados. Relogio de pulso" << endl;
+      cout << "  dourado que consulta com frequencia.\n" << endl;
 
-      case 2:
-        // Adicionar conversa sobre onde estava
-      break;
-
-      case 3:
-        limparTela();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- Sim." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- Mas nao foi nada fora do normal." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Arthur fecha os punhos." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- Se acha que eu mataria meu proprio pai..." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- entao esta completamente maluco." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-      break;
-      
-      case 4:
-        limparTela();
-        cout << "Ele responde rapidamente." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- Alguem precisava assumir eventualmente!" << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- Meu pai nao poderia continuar para sempre." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-      break;
-
-      case 5:
-        // Adicionar pergunta sobre a cena do crime, como o ângulo da facada e a cadeira caída
-      break;
-      
-      case 6:
-        limparTela();
-        cout << "Arthur hesita por um breve instante." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- Nao." << endl; 
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "-- Nao que eu saiba." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Arthur encara Eleanor por alguns segundos." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ARTHUR WHITMORE ==="<<endl;
-        cout << "Ela desvia o olhar." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-      break;
-      
-      case 0:
-        cout<<"=== Sherlock Holmes ==="<<endl;
-        cout<<"-- Tudo bem."<<endl;
-      break;
-
-      default:
-        cout<<"Opcao invalida"<<endl;
-        cout<<"Tente novamente"<<endl;
-      break;
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
     }
-  }while(op!=0);
+    else if(op2!=0 && op2!=1 && op2!=2){
+      cout<<"Opcao invalida"<<endl;
+      cout<<"Tente novamente"<<endl;
+    }
+    else if(op2 == 2){
+      do{
+        Clue discussao_arthur = table.search("discussao_arthur");
+        Clue angulo_facada = table.search("angulo_facada");
+        Clue cadeira_caida = table.search("cadeira_caida");
+        Clue testamento_sucessao = table.search("testamento_sucessao");
+        
+        cout << "=== Perguntas ===" << endl;
+        cout<<" 1. Como era sua relacao com seu pai?" << endl; 
+        cout <<" 2. Onde estava durante o assassinato?" << endl;
+        if(discussao_arthur.descoberta){
+          cout<<" 3. Voces discutiram hoje?" << endl;
+          
+          if(continuacao == 0){continuacao = 1;}
+        }
+        if(continuacao == 1){
+          cout<<" 4. Voce queria assumir a empresa??" << endl;
+        }
+        if(angulo_facada.descoberta && cadeira_caida.descoberta){
+          cout<<" 5. O assassino teve que usar uma cadeira para forjar uma briga. Mas voce tem quase 1,90m..." << endl;
+        }
+        if(testamento_sucessao.descoberta){
+          cout<<" 6. Seu pai pretendia mudar o testamento?" << endl;
+        }
+        cout<<" 0. Se retirar"<<endl;
+        cout<<"Opcao: ";
+        cin>>op;
+        cin.ignore();
+
+        switch(op){
+          case 1:
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Nossa relacao era estritamente profissional." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Ele me via como um substituto, um ativo da empresa, nao como um filho." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+
+          case 2:
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Eu estava trancado no escritorio do andar superior." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Revisando planilhas ate a chegada da policia." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+
+          case 3:
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Sim." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Mas nao foi nada fora do normal." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "Arthur fecha os punhos." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Se acha que eu mataria meu proprio pai..." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- entao esta completamente maluco." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+          
+          case 4:
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "Ele responde rapidamente." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Alguem precisava assumir eventualmente!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Meu pai nao poderia continuar para sempre." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+
+          case 5:
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- O angulo da facada veio de cima para baixo. E ha uma cadeira derrubada na cena, forjando uma luta covarde." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- O senhor e alto e atletico. Se fosse ataca-lo, seria um combate letal de frente. Nao precisaria de uma cadeira." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "Arthur exibe um raro e arrogante sorriso." << endl;
+            cout << "-- Finalmente um detetive com cerebro nesta casa." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Se eu quisesse matar o velho, acredite... eu nao faria esse teatrinho com cadeiras." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+          
+          case 6:
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "Arthur hesita por um breve instante." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Nao." << endl; 
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "-- Nao que eu saiba." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            cout << "Arthur encara Eleanor por alguns segundos." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            cout<<"=== ARTHUR WHITMORE ==="<<endl;
+            cout << "Ela desvia o olhar." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+          
+          case 0:
+            cout<<"=== Sherlock Holmes ==="<<endl;
+            cout<<"-- Tudo bem."<<endl;
+          break;
+
+          default:
+            cout<<"Opcao invalida"<<endl;
+            cout<<"Tente novamente"<<endl;
+          break;
+        }
+      }while(op!=0);
+    }
+  }while(op2!=0);
 }
 
-// ===============[Interrogatório Edward]==============
+// ===============[Interrogatorio Edward]==============
 void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
-  Clue cigarros_turcos = table.search("cigarros_turcos");
-  Clue dedos_amarelados = table.search("dedos_amarelados");
-  Clue cinzeiro_jardim = table.search("cinzeiro_jardim");
-  Clue alibi_edward = table.search("alibi_edward");
-  Clue portao_ferro = table.search("portao_ferro");
-  Clue frasco_antidepressivo = table.search("frasco_antidepressivo");
-  Clue cachimbo_alfredo = table.search("cachimbo_alfredo");
+  // Clues movidas para dentro do loop de perguntas
   
-  int op = -1;
+  int op = -1, op2 = -1;
   
   do{
     cout << endl << "=== FILHO DO MEIO -- EDWARD WHITMORE ===" << endl;
-    // Adicionar as análise de comportamento e características físicas
-    cout<<"=== Características ==="<<endl;
-    cout << "Nervoso." << endl;
-    cout << "Ansioso." << endl;
-    cout << "Instavel.\n" << endl;
-
-    cout << "Perguntas:" << endl;
-    cout<<" 1. Como era sua relacao com seu pai?" << endl; 
-    cout <<" 2. Onde estava durante o assassinato?" << endl;
-    if(cachimbo_alfredo.descoberta && cigarros_turcos.descoberta){
-      cout<<" 4. Voce possui marcas em seus dedos de fumo compulsivo. explique-se." << endl;
-    }
-    // Adicionar  os outros casos de pistas
-    cout<<" 3. Voce ouviu alguma coisa suspeita?" << endl;
-    cout<<" 0. Se retirar"<<endl;
-    cin>>op;
+    cout << "Altura: 1,73m | Porte: Magro | Olhos: Verdes | Cabelo: Castanho-claro\n" << endl;
+    cout<<"1. Avaliacao fisica"<<endl;
+    cout<<"2. Perguntas"<<endl;
+    cout<<"0. Se retirar"<<endl;
+    cout<<"Opcao: ";
+    cin>>op2;
     cin.ignore();
 
-    switch(op){
-      case 1:
-        limparTela();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Ele nunca me respeitou." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Sempre comparava tudo o que eu fazia com Arthur." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Os olhos dele demonstram ressentimento." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        break;
+    if(op2 == 1){
+      cout << "=== Caracteristicas ===" << endl;
+      cout << "Altura: 1,73m (Mediano)" << endl;
+      cout << "Porte: Magro, ombros estreitos e levemente caidos, postura encolhida" << endl;
+      cout << "Olhos: Verdes, raramente se fixam em algo por mais de dois segundos" << endl;
+      cout << "Cabelo: Castanho-claro, um pouco longo demais, caindo sobre a testa" << endl;
+      cout << "Caracteristica distintiva: Dedos indicador e medio da mao direita levemente" << endl;
+      cout << "  amarelados - sinal classico de fumante compulsivo. Labio inferior machucado" << endl;
+      cout << "  de tanto morder. Leve tremor nas maos ao tocar no nome do pai. Quando mente," << endl;
+      cout << "  engole em seco e esconde as maos nos bolsos do paleto." << endl;
+      cout << "Vestimenta: Paleto de tweed marrom ligeiramente largo nos ombros. Camisa branca" << endl;
+      cout << "  com o botao do colarinho aberto. Leve aroma adocicado de tabaco de baunilha" << endl;
+      cout << "  impregna o tecido.\n" << endl;
       
-      case 2:
-        limparTela();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- No jardim." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Pensando." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Eu ouvi a discussao..." << endl; 
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Nao queria participar daquilo." << endl; 
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Holmes percebe um cheiro de cigarro em sua roupa." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        break;
+      investigateClue(table, graph, "dedos_amarelados", inventory, totalClues, realCluesSolved);
 
-      case 3:
-        limparTela();
-        // Adicionar conversa sobre o que ele ouviu
-        break;
-
-      case 4:
-        limparTela();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Passos." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Alguem andando rapido pelo corredor." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== EDWARD WHITMORE ==="<<endl;
-        cout << "-- Mas nao consegui ver quem era." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        break;
-
-      case 0:
-        cout<<"=== Sherlock Holmes ==="<<endl;
-        cout<<"-- Tudo bem."<<endl;
-        break;
-      
-      default:
-        cout<<"Opcao invalida"<<endl;
-        cout<<"Tente novamente"<<endl;
-        break;
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
     }
-  }while(op!=0);
+    else if(op2!=0 && op2!=1 && op2!=2){
+      cout<<"Opcao invalida"<<endl;
+      cout<<"Tente novamente"<<endl;
+    }
+    else if(op2 == 2){
+      do{
+        Clue cigarros_turcos = table.search("cigarros_turcos");
+        Clue dedos_amarelados = table.search("dedos_amarelados");
+        Clue cinzeiro_jardim = table.search("cinzeiro_jardim");
+        Clue alibi_edward = table.search("alibi_edward");
+        Clue portao_ferro = table.search("portao_ferro");
+        Clue frasco_antidepressivo = table.search("frasco_antidepressivo");
+        Clue cachimbo_alfredo = table.search("cachimbo_alfredo");
+        
+        cout << "=== Perguntas ===" << endl;
+        cout<<" 1. Como era sua relacao com seu pai?" << endl; 
+        cout <<" 2. Onde estava durante o assassinato?" << endl;
+        if(cachimbo_alfredo.descoberta && cigarros_turcos.descoberta){
+          cout<<" 4. Voce possui marcas em seus dedos de fumo compulsivo. explique-se." << endl;
+        }
+        if(cinzeiro_jardim.descoberta){
+          cout<<" 5. Encontramos uma bituca na cozinha, mas o senhor fuma no jardim. Explique." << endl;
+        }
+        if(portao_ferro.descoberta){
+          cout<<" 6. O senhor confessou ter usado um lenco para forcar o portao." << endl;
+        }
+        cout<<" 3. Voce ouviu alguma coisa suspeita?" << endl;
+        cout<<" 0. Se retirar"<<endl;
+        cout<<"Opcao: ";
+        cin>>op;
+        cin.ignore();
+
+        switch(op){
+          case 1:
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Ele nunca me respeitou." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Sempre comparava tudo o que eu fazia com Arthur." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "Os olhos dele demonstram ressentimento." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            break;
+          
+          case 2:
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- No jardim." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Pensando." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Eu ouvi a discussao..." << endl; 
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Nao queria participar daquilo." << endl; 
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "Holmes percebe um cheiro de cigarro em sua roupa." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            break;
+
+          case 3:
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Passos." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Quando entrei para pegar gelo, a cozinha estava vazia." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Entao ouvi passos leves, muito rapidos... fugindo para a ala leste do corredor." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Passos de mulher. Fiquei com medo e fugi de volta para o jardim." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "passos_leves", inventory, totalClues, realCluesSolved);
+            investigateClue(table, graph, "alibi_edward", inventory, totalClues, realCluesSolved);
+            break;
+
+          case 4:
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Eu... eu fumo escondido." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Minha mae detesta o cheiro. Mas eu nao fumei dentro de casa!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            break;
+
+          case 5:
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Eu deixei minhas bitucas no cinzeiro la de fora!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Alguem... alguem deve ter pego do cinzeiro e colocado na cozinha para me incriminar!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "cinzeiro_jardim", inventory, totalClues, realCluesSolved);
+            break;
+
+          case 6:
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- O portao de ferro estava emperrado pela ferrugem." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Eu achei um lenco chique caido na grama e usei para forcar a tranca sem machucar a mao." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== EDWARD WHITMORE ==="<<endl;
+            cout << "-- Depois deixei ele caido la mesmo. Alguem pegou ele!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "portao_ferro", inventory, totalClues, realCluesSolved);
+            break;
+
+          case 0:
+            cout<<"=== Sherlock Holmes ==="<<endl;
+            cout<<"-- Tudo bem."<<endl;
+            break;
+          
+          default:
+            cout<<"Opcao invalida"<<endl;
+            cout<<"Tente novamente"<<endl;
+            break;
+        }
+      }while(op!=0);
+    }
+  }while(op2!=0);
 }
 
-// ===============[Interrogatório Violet]==============
+// ===============[Interrogatorio Violet]==============
 void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
-  Clue tirano_domestico = table.search("tirano_domestico");
-  Clue perdeu_medo = table.search("perdeu_medo");
-  Clue alibi_violet = table.search("alibi_violet");
-  Clue faca_crime = table.search("faca_crime");
-  Clue sangue_pia = table.search("sangue_pia");
-  Clue vinho_unhas = table.search("vinho_unhas");
+  // Clues movidas para dentro do loop
 
-  cout << endl << "=== FILHA CACULA -- VIOLET WHITMORE ===" << endl;
-
-  // Adicionar as análise de comportamento e características físicas
-  cout<<"=== Características ==="<<endl;
-  cout << "Calma demais.\n" << endl;
-  
-  
-  int op = -1;
+  int op = -1, op2 = -1;
   do{
-    cout << "Perguntas:" << endl;
-    cout<<" 1. Como era sua relacao com seu pai?" << endl; 
-    cout <<" 2. Onde estava durante o assassinato?" << endl;
-    
-    if(perdeu_medo.descoberta){
-      cout<<" 3. Esta triste?" << endl;
-      cout<<" 4. O que acha que aconteceu?" << endl;
-    }
-    if(alibi_violet.descoberta){
-      cout<<" 5. Voce escutou algo?" << endl;
-    }
-    if(tirano_domestico.descoberta){
-      cout<<" 6. Voce disse que ele so se importava com voce?" << endl;
-    }
-    if(faca_crime.descoberta && sangue_pia.descoberta && vinho_unhas.descoberta){
-      cout<<" 7. Vejo resquícios de vinho tinto sob suas unhas e na barra de seu vestido. Além disso, a pia onde o assassino limpou o sangue exala um perfume de lavanda idêntico ao que sinto vindo de você agora. Como explica essa proximidade com a cena, senhorita Violet?" << endl;
-    }
-    cout<<" 0. Se retirar"<<endl;
-    cin>>op;
+    cout << endl << "=== FILHA CACULA -- VIOLET WHITMORE ===" << endl;
+    cout << "Altura: 1,58m | Porte: Delicado | Olhos: Azuis-gelo | Cabelo: Loiro-escuro\n" << endl;
+    cout<<"1. Avaliacao fisica"<<endl;
+    cout<<"2. Perguntas"<<endl;
+    cout<<"0. Se retirar"<<endl;
+    cout<<"Opcao: ";
+    cin>>op2;
     cin.ignore();
 
-    switch(op){
-      case 1:
-        limparTela();
-        cout << "Ela sorri discretamente." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Ah, detetive... eu era a caçula, a protegida dele." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Ele me dava tudo o que eu pedia e tentava me manter longe das disputas corporativas que destruíam meus irmãos." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Nossa relacao era maravilhosa. Acredito que era a unica que ele realmente se importava." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-
-        investigateClue(table, graph, "perdeu_medo", inventory, totalClues, realCluesSolved);
-      break;
-
-      case 2:
-        limparTela();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- No meu quarto de costura no fim do corredor." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Eu estava terminando o bordado de um vestido novo." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "alibi_violet", inventory, totalClues, realCluesSolved);
-      break;
+    if(op2 == 1){
+      cout << "=== Caracteristicas ===" << endl;
+      cout << "Altura: 1,58m (Baixa)" << endl;
+      cout << "Porte: Delicado, mas com tensao muscular incomum nos antebracos e nas maos" << endl;
+      cout << "Olhos: Azuis-gelo, frios e distantes - mesmo quando a boca sorri, os olhos" << endl;
+      cout << "  nao acompanham" << endl;
+      cout << "Cabelo: Loiro-escuro, ondulado, caindo perfeitamente sobre os ombros" << endl;
+      cout << "Caracteristica distintiva: Sob as unhas polidas, minusculas crostas arroxeadas" << endl;
+      cout << "  de vinho tinto seco. Na barra interna da manga direita, uma sutil mancha" << endl;
+      cout << "  escura. Suas maos estao tensas, os tendoes visiveis sob a pele palida. Um" << endl;
+      cout << "  perfume de lavanda exala de suas maos." << endl;
+      cout << "Vestimenta: Vestido de seda lavanda com mangas longas e detalhes de renda na" << endl;
+      cout << "  gola. O tecido e caro, mas a cor clarissima torna ainda mais suspeita a" << endl;
+      cout << "  mancha na barra.\n" << endl;
       
-      case 3:
-        limparTela();
-        cout << "Ela encara Holmes em silencio." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- E como nao estaria?" << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Sherlock observa atentamente." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Ela fala sobre tristeza." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "Mas nao demonstra nenhuma." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-      break;
+      investigateClue(table, graph, "frieza_violet", inventory, totalClues, realCluesSolved);
+      investigateClue(table, graph, "adrenalina_violet", inventory, totalClues, realCluesSolved);
+      investigateClue(table, graph, "vinho_unhas", inventory, totalClues, realCluesSolved);
 
-      case 4:
-        limparTela();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Acho que alguem finalmente perdeu o medo dele." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout << "A sala inteira permanece em silencio por alguns segundos." << endl; //"silêncio" não precisa de ajuste aqui, mas vou ajustar para consistência
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "tirano_domestico", inventory, totalClues, realCluesSolved);
-      break;
-
-      case 5:
-        limparTela();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Eu estava com os meus fones de ouvido e não escutei absolutamente nada até os gritos dos policiais." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "fones_ouvido", inventory, totalClues, realCluesSolved);
-      break;
-      
-      case 6:
-        limparTela();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Meu pai era um tirano doméstico, detetive Holmes." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Ele esmagava a individualidade de todos nesta casa." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Arthur virou um ganancioso previsivel. \nEdward um feixe de nervos ansioso \nE minha mae uma dependente de remedios." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- E uma dor imensa que sinto, mas ele nao era uma pessoa boa, acho que isso foi apenas o karma dele." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== VIOLET WHITMORE ==="<<endl;
-        cout << "-- Alguem finalmente perdeu o medo dele." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "karma_violet", inventory, totalClues, realCluesSolved);
-      break;
-
-      case 7:
-        // Adicionar conversa sobre a proximidade dela com a cena do crime, como o vinho tinto sob as unhas e o perfume de lavanda
-      break;
-
-      case 0:
-        cout<<"=== Sherlock Holmes ==="<<endl;
-        cout<<"-- Tudo bem."<<endl;
-      break;
-      
-      default:
-        cout<<"Opcao invalida"<<endl;
-        cout<<"Tente novamente"<<endl;
-      break;
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
     }
-  }while(op!=0);
+    else if(op2!=0 && op2!=1 && op2!=2){
+      cout<<"Opcao invalida"<<endl;
+      cout<<"Tente novamente"<<endl;
+    }
+    else if(op2 == 2){
+      do{
+        Clue tirano_domestico = table.search("tirano_domestico");
+        Clue perdeu_medo = table.search("perdeu_medo");
+        Clue alibi_violet = table.search("alibi_violet");
+        Clue faca_crime = table.search("faca_crime");
+        Clue sangue_pia = table.search("sangue_pia");
+        Clue vinho_unhas = table.search("vinho_unhas");
+
+        cout << "=== Perguntas ===" << endl;
+        cout<<" 1. Como era sua relacao com seu pai?" << endl; 
+        cout <<" 2. Onde estava durante o assassinato?" << endl;
+        
+        if(perdeu_medo.descoberta){
+          cout<<" 3. Esta triste?" << endl;
+          cout<<" 4. O que acha que aconteceu?" << endl;
+        }
+        if(alibi_violet.descoberta){
+          cout<<" 5. Voce escutou algo?" << endl;
+        }
+        if(tirano_domestico.descoberta){
+          cout<<" 6. Voce disse que ele so se importava com voce?" << endl;
+        }
+        if(faca_crime.descoberta && sangue_pia.descoberta && vinho_unhas.descoberta){
+          cout<<" 7. Vejo resquicios de vinho tinto sob suas unhas e na barra de seu vestido. Alem disso, a pia onde o assassino limpou o sangue exala um perfume de lavanda identico ao que sinto vindo de voce agora. Como explica essa proximidade com a cena, senhorita Violet?" << endl;
+        }
+        cout<<" 0. Se retirar"<<endl;
+        cout<<"Opcao: ";
+        cin>>op;
+        cin.ignore();
+
+        switch(op){
+          case 1:
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "Ela sorri discretamente." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Ah, detetive... eu era a cacula, a protegida dele." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Ele me dava tudo o que eu pedia e tentava me manter longe das disputas corporativas que destruiam meus irmaos." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Nossa relacao era maravilhosa. Acredito que era a unica que ele realmente se importava." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+
+            investigateClue(table, graph, "perdeu_medo", inventory, totalClues, realCluesSolved);
+          break;
+
+          case 2:
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- No meu quarto de costura no fim do corredor." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Eu estava terminando o bordado de um vestido novo." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "alibi_violet", inventory, totalClues, realCluesSolved);
+          break;
+          
+          case 3:
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "Ela encara Holmes em silencio." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- E como nao estaria?" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "Sherlock observa atentamente." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "Ela fala sobre tristeza." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "Mas nao demonstra nenhuma." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+
+          case 4:
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Acho que alguem finalmente perdeu o medo dele." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "A sala inteira permanece em silencio por alguns segundos." << endl; //"silencio" nao precisa de ajuste aqui, mas vou ajustar para consistencia
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "tirano_domestico", inventory, totalClues, realCluesSolved);
+          break;
+
+          case 5:
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Eu estava com os meus fones de ouvido e nao escutei absolutamente nada ate os gritos dos policiais." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "fones_ouvido", inventory, totalClues, realCluesSolved);
+          break;
+          
+          case 6:
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Meu pai era um tirano domestico, detetive Holmes." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Ele esmagava a individualidade de todos nesta casa." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Arthur virou um ganancioso previsivel. \nEdward um feixe de nervos ansioso \nE minha mae uma dependente de remedios." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- E uma dor imensa que sinto, mas ele nao era uma pessoa boa, acho que isso foi apenas o karma dele." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Alguem finalmente perdeu o medo dele." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "karma_violet", inventory, totalClues, realCluesSolved);
+          break;
+
+          case 7:
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- Vejo resquicios de vinho tinto sob suas unhas e na barra do seu vestido." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- Alem disso, a pia onde o assassino tentou limpar o sangue da faca exala um perfume de lavanda identico ao que sinto em voce." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== SHERLOCK HOLMES ==="<<endl;
+            cout << "-- Como explica essa conexao intima com a cena do crime, senhorita Violet?" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "Ela pisca devagar, mantendo a postura de porcelana impecavel." << endl;
+            cout << "-- Intimidade? Detetive Holmes, eu apenas fui a cozinha pegar uma taca do meu vinho preferido..." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Acabei derrubando minha taca no chao por descuido. Lavei minhas maos na pia ali mesmo..." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            cout<<"=== VIOLET WHITMORE ==="<<endl;
+            cout << "-- Foi tudo antes da tragedia. Que fatalidade infeliz..." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+          break;
+
+          case 0:
+            cout<<"=== Sherlock Holmes ==="<<endl;
+            cout<<"-- Tudo bem."<<endl;
+          break;
+          
+          default:
+            cout<<"Opcao invalida"<<endl;
+            cout<<"Tente novamente"<<endl;
+          break;
+        }
+      }while(op!=0);
+    }
+  }while(op2!=0);
 }
 
-// ===============[Interrogatório Alfred]==============
+// ===============[Interrogatorio Alfred]==============
 void alfredInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
-  Clue cigarros_turcos = table.search("cigarros_turcos");
+  // Clues movidas para dentro do loop
 
-  int op = -1;
+  int op = -1, op2 = -1;
   int continuacao = 0;
   do{
     cout << endl << "=== MORDOMO -- ALFRED ===" << endl;
-    cout<<"=== Características ==="<<endl;
-    cout << "Velho." << endl;
-    cout << "Exausto." << endl;
-    cout << "Amargurado.\n" << endl;
-
-    cout << "Perguntas:" << endl;
-    cout<<" 1. Como era sua relacao com seu pai?" << endl; 
-    cout<<" 2. Onde estava durante o assassinato?" << endl;
-    if(continuacao == 0){
-      cout<<" 3. O senhor ouviu algo?" << endl;
+    cout << "Altura: 1,80m | Porte: Magro e anguloso | Olhos: Cinzentos | Cabelo: Branco\n" << endl;
+    cout<<"1. Avaliacao fisica"<<endl;
+    cout<<"2. Perguntas"<<endl;
+    cout<<"0. Se retirar"<<endl;
+    cout<<"Opcao: ";
+    cin>>op2;
+    cin.ignore();
+    
+    if(op2 == 1){
+      cout<<"=== Caracteristicas ==="<<endl;
+      cout << "Altura: 1,80m (Alto)" << endl;
+      cout << "Porte: Magro e anguloso, ombros levemente arqueados por decadas de servico" << endl;
+      cout << "Olhos: Cinzentos, cansados, observam tudo sem parecer olhar para nada" << endl;
+      cout << "Cabelo: Completamente branco, ralo no topo, penteado para o lado com precisao militar" << endl;
+      cout << "Caracteristica distintiva: Maos calejadas de quem passou a vida inteira polindo" << endl;
+      cout << "  prataria e abrindo portoes emperrados. Leve tremor nas maos - nao de" << endl;
+      cout << "  nervosismo, mas de idade. Um aroma de tabaco de cachimbo barato impregna" << endl;
+      cout << "  suas roupas." << endl;
+      cout << "Vestimenta: Uniforme de mordomo impecavelmente passado, mas visivelmente velho -" << endl;
+      cout << "  o tecido dos cotovelos ja comeca a ficar lustroso de tanto uso. Luvas brancas" << endl;
+      cout << "  que ele remove apenas para fumar seu cachimbo no jardim. Sapatos pretos" << endl;
+      cout << "  engraxados, mas com o solado gasto." << endl;
     }
-    if(continuacao == 2){
-      cout<<" 4. Reconheceu os passos?" << endl;
+    else if(op2!=0 && op2!=1 && op2!=2){
+      cout<<"Opcao invalida"<<endl;
+      cout<<"Tente novamente"<<endl;
     }
-    if(cigarros_turcos.descoberta){
-      cout<<" 5. Encontramos um maço de cigarros turcos, que estava na cozinha é sua?" << endl;
-    }
-    cout<<" 0. Se retirar"<<endl;
-    cin>>op;
+    
+    else if(op2 == 2){
+      do
+      {
+        Clue cigarros_turcos = table.search("cigarros_turcos");
 
-    switch(op){
-      case 1:
-        limparTela();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Ele me tratava como mobilia." << endl; //"mobília" não precisa de ajuste aqui, mas vou ajustar para consistência
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Eu servia a esta familia ha mais de vinte anos." << endl; //"família" e "há" não precisam de ajuste aqui, mas vou ajustar para consistência
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Mas para o Sr. Raymond, homens da minha classe são como mobília. Invisíveis." << endl; //"família" e "há" não precisam de ajuste aqui, mas vou ajustar para consistência
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "mordomo_invisivel", inventory, totalClues, realCluesSolved);
-      break;
-
-      case 2:
-        limparTela();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Eu estava nos aposentos dos fundos da criadagem, organizando a prataria do jantar de amanhã. " << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Não saí de lá até ouvir a correria dos policiais." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
+        cout << "=== Perguntas ===" << endl;
+        cout<<" 1. Como era sua relacao com seu pai?" << endl; 
+        cout<<" 2. Onde estava durante o assassinato?" << endl;
         if(continuacao == 0){
-          continuacao = 1;
+          cout<<" 3. O senhor ouviu algo?" << endl;
         }
-      break;
+        if(continuacao == 2){
+          cout<<" 4. Reconheceu os passos?" << endl;
+        }
+        if(cigarros_turcos.descoberta){
+          cout<<" 5. Encontramos um maco de cigarros turcos, que estava na cozinha e sua?" << endl;
+        }
+        cout<<" 0. Se retirar"<<endl;
+        cout<<"Opcao: ";
+        cin>>op;
+        cin.ignore();
 
-      case 3:
-        limparTela();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Passos rapidos no corredor." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        continuacao = 2;
-      break;
+        switch(op){
+          case 1:
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Ele me tratava como mobilia." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Eu servia a esta familia ha mais de vinte anos." << endl; 
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Mas para o Sr. Raymond, homens da minha classe sao como mobilia. Invisiveis." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "mordomo_invisivel", inventory, totalClues, realCluesSolved);
+          break;
 
-      case 4:
-        limparTela();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "Ele hesita." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Leves demais para serem de um homem." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "passos_leves", inventory, totalClues, realCluesSolved);
-      break;
+          case 2:
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Eu estava nos aposentos dos fundos da criadagem, organizando a prataria do jantar de amanha. " << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Nao sai de la ate ouvir a correria dos policiais." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            if(continuacao == 0){
+              continuacao = 1;
+            }
+          break;
 
-      case 5:
-        limparTela();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Não, senhor!" << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Eu fumo meu cachimbo velho no jardim, senhores. Não tenho dinheiro para os luxos que os jovens compram na cidade." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        cout<<"=== ALFRED ==="<<endl;
-        cout << "-- Talvez, o jovem Edward que compra esses maços importados da cidade." << endl;
-        cout << "\nPara prosseguir aperte Enter..." << endl;
-        next();
-        investigateClue(table, graph, "cachimbo_alfred", inventory, totalClues, realCluesSolved);
-      break;
+          case 3:
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Passos rapidos no corredor." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            continuacao = 2;
+          break;
 
-      case 0:
-        cout<<"=== Sherlock Holmes ==="<<endl;
-        cout<<"-- Tudo bem."<<endl;
-        break;
-      
-      default:
-        cout<<"Opcao invalida"<<endl;
-        cout<<"Tente novamente"<<endl; //Não precisa de ajuste
-        break;
+          case 4:
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "Ele hesita." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Leves demais para serem de um homem." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "passos_leves", inventory, totalClues, realCluesSolved);
+          break;
+
+          case 5:
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Nao, senhor!" << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Eu fumo meu cachimbo velho no jardim, senhores. Nao tenho dinheiro para os luxos que os jovens compram na cidade." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+            cout<<"=== ALFRED ==="<<endl;
+            cout << "-- Talvez, o jovem Edward que compra esses macos importados da cidade." << endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            investigateClue(table, graph, "cachimbo_alfred", inventory, totalClues, realCluesSolved);
+          break;
+
+          case 0:
+            cout<<"=== Sherlock Holmes ==="<<endl;
+            cout<<"-- Tudo bem."<<endl;
+            break;
+          
+          default:
+            cout<<"Opcao invalida"<<endl;
+            cout<<"Tente novamente"<<endl; //Nao precisa de ajuste
+            break;
+        }
+      } while (op!=0);
     }
-  }while(op!=0);
+  }while(op2!=0);
 }
 
 void interrogationScene(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
   cout << endl << "=== INTERROGATORIO ===" << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
   
   int op = -1;
   while(op != 0){
@@ -1144,9 +1533,9 @@ void interrogationScene(TabelaHash &table, Grafo &graph, Clue inventory[], int &
         cout<<"Saindo"<<endl;
         break;
       default:
-          cout<<"Opcao invalida"<<endl;
-          cout<<"Tente novamente"<<endl; //Não precisa de ajuste
-          break;
+        cout<<"Opcao invalida"<<endl;
+        cout<<"Tente novamente"<<endl;
+        break;
     }
   }
 }
@@ -1154,9 +1543,9 @@ void interrogationScene(TabelaHash &table, Grafo &graph, Clue inventory[], int &
 
 //---------------[Final]---------------
 void bestEnding(){
-  cout << "Sherlock reunia todos." << endl; //"reunia" não precisa de ajuste aqui, mas vou ajustar para consistência
+  cout << "Sherlock reunia todos." << endl; //"reunia" nao precisa de ajuste aqui, mas vou ajustar para consistencia
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "E explica:" << endl;
   cout << "- as facadas eram exageradas demais;" << endl;
@@ -1166,38 +1555,38 @@ void bestEnding(){
   cout << "- passos leves;" << endl;
   cout << "- ausencia de emocao genuina." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
-  cout << "Entao Holmes encara Violet." << endl; //"Então" não precisa de ajuste aqui, mas vou ajustar para consistência
+  cout << "Entao Holmes encara Violet." << endl; //"Entao" nao precisa de ajuste aqui, mas vou ajustar para consistencia
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
-  cout << "E ela..." << endl; //"..." não precisa de ajuste aqui, mas vou ajustar para consistência
+  cout << "E ela..." << endl; //"..." nao precisa de ajuste aqui, mas vou ajustar para consistencia
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "sorri." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "Nao porque foi pega." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << "Mas porque:" << endl;
   cout << "finalmente encontrou alguem capaz de entende-la." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
-  next();
+  pausa();
 
   cout << endl << "===== FIM =====" << endl;
 };
 
-//---------------[Menus Acusações]---------------
-void accusationMenu(){ //Cena de acusação
+//---------------[Menus Acusacoes]---------------
+void accusationMenu(){ //Cena de acusacao
   int opt = 0;
   limparTela();
 
-  cout << "\nQuem e o assassino?\n"; //"é" não precisa de ajuste aqui, mas vou ajustar para consistência
+  cout << "\nQuem e o assassino?\n"; //"e" nao precisa de ajuste aqui, mas vou ajustar para consistencia
   cout << "1 - Eleanor\n2 - Arthur\n3 - Edward\n4 - Violet\n5 - Alfred\n";
 
   cin >> opt;
@@ -1231,7 +1620,8 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
     cout << " 6. Bituca de Cigarro" << endl;
     cout << " 7. Frasco de Remedio no lixo" << endl;
     cout << " 8. Conversar com alguns empregados" << endl;
-    cout << " 9. Ver Inventario" << endl;
+    cout << "9. Analisar fisico da vitima" << endl;
+    cout << " 10. Ver Inventario" << endl;
     cout << " 0. Se retirar" << endl;
 
     cin >> op;
@@ -1284,8 +1674,15 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
         break;
       case 8:
         investigateClue(table, graph, "discussao_arthur", inventory, totalClues, realCluesSolved);
-        break;
+      break;
       case 9:
+        cout << endl << "=== VITIMA -- RAYMOND WHITMORE ===" << endl;
+        cout << "Altura: 1,82m | Porte: Robusto e imponente | Olhos: Castanho-escuros | Cabelo: Grisalho" << endl;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        
+        break;
+      case 10:
         showInventory(inventory, totalClues);
         break;
       case 0:
@@ -1324,7 +1721,7 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
         if(realCluesSolved >= 3){
           accusationMenu();
         }else{
-          cout << "\nHolmes ainda nao possui evidencias suficientes.\n"; //"evidências" não precisa de ajuste aqui, mas vou ajustar para consistência
+          cout << "\nHolmes ainda nao possui evidencias suficientes.\n"; //"evidencias" nao precisa de ajuste aqui, mas vou ajustar para consistencia
         }
         break;
       case 0:
@@ -1338,7 +1735,7 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
   
 }
 
-//---------------[Criações]---------------
+//---------------[Criacoes]---------------
 void createClues(TabelaHash &table){
     // ============================================
     // PISTAS PRINCIPAIS (realClue = true)
@@ -1395,7 +1792,7 @@ void createClues(TabelaHash &table){
         microfissuras_cabo.description = "Existem microfissuras na estrutura de polimero do cabo da faca. "
                                           "Isso indica que quem a segurou aplicou uma forca excessiva "
                                           "induzida por tensao extrema, adrenalina e forte obsessao emocional. "
-                                          "Nao e um golpe frio e calculado — e um crime passional.";
+                                          "Nao e um golpe frio e calculado - e um crime passional.";
         microfissuras_cabo.question = "O que as microfissuras no cabo da faca revelam sobre o estado emocional do assassino?";
         microfissuras_cabo.options[0] = "O assassino estava calmo e calculista";
         microfissuras_cabo.options[1] = "A faca era de baixa qualidade e quebrou sozinha";
@@ -1441,7 +1838,7 @@ void createClues(TabelaHash &table){
         taca_vinho.description = "Uma unica taca de vinho quebrada no chao. "
                                   "O liquido derramado indica que o homem estava sozinho "
                                   "apreciando a bebida antes do ataque. "
-                                  "Nao ha segunda taca — ele nao estava acompanhado.";
+                                  "Nao ha segunda taca - ele nao estava acompanhado.";
         taca_vinho.question = "O que a presenca de uma unica taca de vinho indica?";
         taca_vinho.options[0] = "O assassino bebeu com a vitima antes do crime";
         taca_vinho.options[1] = "A vitima estava sozinha bebendo vinho antes do ataque";
@@ -1462,7 +1859,7 @@ void createClues(TabelaHash &table){
         sangue_pia.description = "Pequenos pingos de sangue perto da pia. "
                                   "O padrao de diluicao mostra que alguem lavou rapidamente "
                                   "as maos ali logo apos o ataque. Um cheiro do detergente "
-                                  "permanece no local — um cheiro agradavel de lavanda.";
+                                  "permanece no local - um cheiro agradavel de lavanda.";
         sangue_pia.question = "O que o sangue diluido na pia revela sobre o assassino?";
         sangue_pia.options[0] = "A vitima tentou se limpar antes de morrer";
         sangue_pia.options[1] = "O assassino lavou as maos na pia apos o crime";
@@ -1535,7 +1932,7 @@ void createClues(TabelaHash &table){
         cigarros_turcos.question = "O que a bituca de cigarro turco na cozinha sugere?";
         cigarros_turcos.options[0] = "O mordomo Alfred e o assassino";
         cigarros_turcos.options[1] = "A vitima estava fumando antes de morrer";
-        cigarros_turcos.options[2] = "Alguem que fuma cigarros turcos esteve na cozinha — ou a bituca foi plantada la";
+        cigarros_turcos.options[2] = "Alguem que fuma cigarros turcos esteve na cozinha - ou a bituca foi plantada la";
         cigarros_turcos.options[3] = "E uma pista irrelevante";
         cigarros_turcos.correctReponse = 2;
         cigarros_turcos.resolvida = false;
@@ -1601,7 +1998,7 @@ void createClues(TabelaHash &table){
                                         "motivo passional para o crime.";
         suspeita_traicao.question = "Qual o possivel motivo de Eleanor para cometer o crime?";
         suspeita_traicao.options[0] = "Ela queria a heranca das empresas";
-        suspeita_traicao.options[1] = "Ela suspeitava que Raymond a traia — motivo passional";
+        suspeita_traicao.options[1] = "Ela suspeitava que Raymond a traia - motivo passional";
         suspeita_traicao.options[2] = "Ela foi chantageada por Arthur";
         suspeita_traicao.options[3] = "Ela nao tinha motivo algum";
         suspeita_traicao.correctReponse = 1;
@@ -1628,7 +2025,7 @@ void createClues(TabelaHash &table){
         passos_leves.question = "O que os passos leves no corredor indicam sobre o assassino?";
         passos_leves.options[0] = "Era um homem pesando mais de 90 quilos";
         passos_leves.options[1] = "Duas pessoas estavam no corredor";
-        passos_leves.options[2] = "Provavelmente era uma mulher — passos leves demais para homem";
+        passos_leves.options[2] = "Provavelmente era uma mulher - passos leves demais para homem";
         passos_leves.options[3] = "Nao e possivel deduzir nada a partir de passos";
         passos_leves.correctReponse = 2;
         passos_leves.resolvida = false;
@@ -1643,7 +2040,7 @@ void createClues(TabelaHash &table){
         dedos_amarelados.idClue = 14;
         dedos_amarelados.title = "Dedos Amarelados de Fumante";
         dedos_amarelados.description = "Watson observou que os dedos indicador e medio de Edward "
-                                        "estao levemente amarelados — um sinal classico de fumante "
+                                        "estao levemente amarelados - um sinal classico de fumante "
                                         "compulsivo. Isso contradiz a afirmacao inicial de Edward "
                                         "de que 'ninguem nesta familia fuma'. Edward mais tarde "
                                         "admitiu que fuma cigarros turcos escondido da mae.";
@@ -1711,7 +2108,7 @@ void createClues(TabelaHash &table){
         sintomas_eleanor.description = "Sherlock observou que Eleanor apresenta agitacao extrema nos pes, "
                                         "espasmos musculares e uma forte sonolencia incapacitante. "
                                         "Ela afirma tomar sedativos para insonia, mas esses sintomas "
-                                        "sao classicos de abuso de antidepressivos sem prescricao — "
+                                        "sao classicos de abuso de antidepressivos sem prescricao - "
                                         "exatamente o tipo de medicamento encontrado no frasco "
                                         "de Edward descartado no lixo da cozinha.";
         sintomas_eleanor.question = "O que os sintomas de Eleanor realmente indicam?";
@@ -1735,7 +2132,7 @@ void createClues(TabelaHash &table){
                                            "sobre uma possivel mudanca no testamento, ele travou "
                                            "e encarou a mae, Eleanor, com um olhar de indagacao. "
                                            "Ela nao respondeu. Isso sugere que Eleanor sabe algo "
-                                           "sobre o testamento que Arthur desconhece — ou que "
+                                           "sobre o testamento que Arthur desconhece - ou que "
                                            "os dois tem um segredo compartilhado sobre a heranca.";
         testamento_sucessao.question = "O que a reacao de Arthur ao falar do testamento sugere?";
         testamento_sucessao.options[0] = "Ele ja sabia que foi deserdado";
@@ -1760,10 +2157,10 @@ void createClues(TabelaHash &table){
                                          "sao como mobilia. Invisiveis.' Isso indica um profundo "
                                          "ressentimento acumulado por decadas de tratamento indigno. "
                                          "Por ser 'invisivel', Alfred poderia circular pela casa "
-                                         "sem ser notado — a testemunha perfeita... ou o assassino perfeito.";
+                                         "sem ser notado - a testemunha perfeita... ou o assassino perfeito.";
         mordomo_invisivel.question = "Por que a 'invisibilidade' de Alfred e relevante?";
         mordomo_invisivel.options[0] = "Significa que ele nao pode ser testemunha de nada";
-        mordomo_invisivel.options[1] = "Ele poderia circular sem ser notado — testemunha ou suspeito ideal";
+        mordomo_invisivel.options[1] = "Ele poderia circular sem ser notado - testemunha ou suspeito ideal";
         mordomo_invisivel.options[2] = "Prova que ele e o assassino";
         mordomo_invisivel.options[3] = "Indica que ele nao trabalha mais na casa";
         mordomo_invisivel.correctReponse = 1;
@@ -1786,7 +2183,7 @@ void createClues(TabelaHash &table){
                                        "dos cigarros encontrados na cozinha.";
         cachimbo_alfred.question = "O cheiro de fumo em Alfred e compativel com os cigarros da cena do crime?";
         cachimbo_alfred.options[0] = "Sim, e exatamente o mesmo tabaco turco";
-        cachimbo_alfred.options[1] = "Nao — Alfred fuma cachimbo barato, nao cigarros turcos de luxo";
+        cachimbo_alfred.options[1] = "Nao - Alfred fuma cachimbo barato, nao cigarros turcos de luxo";
         cachimbo_alfred.options[2] = "Alfred nao fuma, o cheiro e de outra pessoa";
         cachimbo_alfred.options[3] = "O cheiro nao tem como ser identificado";
         cachimbo_alfred.correctReponse = 1;
@@ -1833,11 +2230,11 @@ void createClues(TabelaHash &table){
                                      "de 'filha perfeita', mas seus olhos permanecem frios e distantes, "
                                      "com pouco vestigio real de luto ou calor afetivo. "
                                      "Quando perguntada se esta triste, ela diz: 'E como nao estar mais triste?' "
-                                     "— mas Sherlock nota que ela DIZ que sente, mas nao demonstra.";
+                                     "- mas Sherlock nota que ela DIZ que sente, mas nao demonstra.";
         frieza_violet.question = "O que o comportamento de Violet revela?";
         frieza_violet.options[0] = "Ela esta profundamente abalada e chora escondido";
         frieza_violet.options[1] = "Ela tem uma personalidade naturalmente fria, sem relacao com o crime";
-        frieza_violet.options[2] = "Ela afirma sentir tristeza mas nao demonstra — ausencia de luto genuino";
+        frieza_violet.options[2] = "Ela afirma sentir tristeza mas nao demonstra - ausencia de luto genuino";
         frieza_violet.options[3] = "Ela esta em estado de choque e por isso age assim";
         frieza_violet.correctReponse = 2;
         frieza_violet.resolvida = false;
@@ -1861,7 +2258,7 @@ void createClues(TabelaHash &table){
         perdeu_medo.question = "Por que a frase 'alguem finalmente perdeu o medo dele' e tao importante?";
         perdeu_medo.options[0] = "E uma frase comum sem significado especial";
         perdeu_medo.options[1] = "Revela que o pai era amado por todos";
-        perdeu_medo.options[2] = "Soa como confissao velada — indica alivio, nao choque, e conhecimento intimo";
+        perdeu_medo.options[2] = "Soa como confissao velada - indica alivio, nao choque, e conhecimento intimo";
         perdeu_medo.options[3] = "Mostra que Violet acredita em teorias da conspIracao";
         perdeu_medo.correctReponse = 2;
         perdeu_medo.resolvida = false;
@@ -1880,7 +2277,7 @@ void createClues(TabelaHash &table){
                                          "Ela diz estar triste e abalada, mas seu corpo conta "
                                          "uma historia diferente. A tensao muscular e compativel "
                                          "com alguem que passou por um esforco fisico extremo "
-                                         "recentemente — como esfaquear alguem com forca obsessiva.";
+                                         "recentemente - como esfaquear alguem com forca obsessiva.";
         adrenalina_violet.question = "O que as maos tensas de Violet sugerem?";
         adrenalina_violet.options[0] = "Ela esta apenas nervosa pelo interrogatorio";
         adrenalina_violet.options[1] = "A tensao pode indicar esforco fisico recente, compativel com o crime";
@@ -1973,7 +2370,7 @@ void createClues(TabelaHash &table){
                                     "(3) Sua calma e ausencia de luto genuino.";
         alibi_violet.question = "O alibi de Violet e confiavel?";
         alibi_violet.options[0] = "Sim, ela tem uma testemunha ocular";
-        alibi_violet.options[1] = "Nao — multiplas evidencias a contradizem";
+        alibi_violet.options[1] = "Nao - multiplas evidencias a contradizem";
         alibi_violet.options[2] = "Sim, pois ela e a filha cacula";
         alibi_violet.options[3] = "E impossivel determinar";
         alibi_violet.correctReponse = 1;
@@ -2016,12 +2413,12 @@ void createClues(TabelaHash &table){
                                     "mas ele nao era uma pessoa boa, acho que isso foi apenas "
                                     "o karma dele.' Esta frase revela que, apesar de afirmar "
                                     "estar triste, ela racionaliza o assassinato como algo "
-                                    "merecido. Nao ha indignacao contra o assassino — "
+                                    "merecido. Nao ha indignacao contra o assassino - "
                                     "ha aceitacao do destino do pai.";
         karma_violet.question = "O que a frase 'foi apenas o karma dele' revela sobre Violet?";
         karma_violet.options[0] = "Ela acredita em religioes orientais";
         karma_violet.options[1] = "Ela sente raiva do assassino e quer justica";
-        karma_violet.options[2] = "Ela racionaliza o crime como merecido — falta de indignacao moral";
+        karma_violet.options[2] = "Ela racionaliza o crime como merecido - falta de indignacao moral";
         karma_violet.options[3] = "Ela nao entendeu a pergunta";
         karma_violet.correctReponse = 2;
         karma_violet.resolvida = false;
@@ -2108,8 +2505,8 @@ int main() {
   createClues(table);
   createConnectionsClue(gInvestigation);
   
-  introStory();
-  crimeScene();
+  //introStory();
+  //crimeScene();
   interrogationScene(table, gInvestigation, inventory, totalClues, realCluesSolved);
   menuManager(table, gInvestigation, inventory, totalClues, realCluesSolved);
 
