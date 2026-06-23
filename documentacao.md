@@ -112,15 +112,6 @@ Classe responsável pelo armazenamento e gerenciamento das pistas.
 
 ---
 
-#### searchId(int id)
-
-* **Descrição:** Busca uma pista na tabela hash pelo ID;
-* **Parâmetros:** id — ID da pista.
-* **Retorno:** pista completa.
-  Caso não exista, retorna uma pista vazia .
-
----
-
 #### remover(string key)
 
 * **Descrição:** Remove uma pista da tabela hash.
@@ -158,25 +149,13 @@ O grafo é utilizado para exibir a linha de raciocínio investigativa de Sherloc
 
 ---
 
-#### addNo(string idClue, int nivel)
+#### addConnections(int v1, int v2)
 
-* **Descrição:** Cria e adiciona um novo nó ao grafo.
+* **Descrição:** Cria uma conexão entre duas pistas.
 * **Parâmetros:**
 
-  * `idClue` — identificador da pista.
-  * `nivel` — nível investigativo da pista.
-* **Retorno:** Ponteiro para o nó criado.
-
----
-
-#### dfsRaciocinio(No* atual, bool visitados[], TabelaHash &table)
-
-* **Descrição:** Busca em profundidade (recursiva) para a criação de uma linha de racioncínio baseada nas pistas.
-* **Parâmetros:**
-
-  * `No* atual`: cria um nó.
-  * `visitados[]`: array que guarda nó(s) visitados.
-  * `&table`: Referência para a tabela hash de pistas.
+  * `v1` — índice do vértice de origem.
+  * `v2` — índice do vértice de destino.
 * **Retorno:** Nenhum.
 
 ---
@@ -192,9 +171,7 @@ O grafo é utilizado para exibir a linha de raciocínio investigativa de Sherloc
 #### showReasoningLine(string clueKey)
 
 * **Descrição:** Exibe visualmente a linha de raciocínio das pistas conectadas.
-* **Parâmetros:** 
-  * `clueKey` — identificador da pista.
-  * `&table`: Referência para a tabela hash de pistas.
+* **Parâmetros:** `clueKey` — identificador da pista.
 * **Retorno:** Nenhum.
 
 ---
