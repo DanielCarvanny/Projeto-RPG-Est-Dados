@@ -282,20 +282,22 @@ void addInventory(Clue inventory[],int &totalClues,Clue clue){
   cout << "\n[Pista adicionada ao inventario]\n";
 }
 void showInventory(Clue inventory[],int totalClues){
+  limparTela();
   cout << "\n===== INVENTARIO DE PISTAS =====\n";
-
+  
   if(totalClues == 0){
     cout << "Nenhuma pista encontrada.\n";
     return;
   }
-
+  
   for(int i = 0; i < totalClues; i++){
-
+    
     cout << "\n[" << inventory[i].title << "]\n";
-
+    
     cout << inventory[i].description << endl;
   }
-
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  
   cout << endl;
 }
 
@@ -331,7 +333,7 @@ void showDeduction(Grafo &graph, TabelaHash &table, string clueKey){
   graph.showReasoningLine(clueKey, table);
 }
 void investigateClue(TabelaHash &table, Grafo &graph, string key, Clue inventory[], int &totalClues, int &realCluesSolved){
-  limparTela();
+  //limparTela();
   Clue clue = table.search(key);
 
   if(clue.idClue == -1){
@@ -344,8 +346,11 @@ void investigateClue(TabelaHash &table, Grafo &graph, string key, Clue inventory
   }
   clue.descoberta = true;
 
+  limparTela();
   cout << "\n------[" << clue.title << "]------\n";
   cout << clue.description << endl;
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
 
   addInventory(inventory, totalClues, clue);
 
@@ -357,6 +362,7 @@ void investigateClue(TabelaHash &table, Grafo &graph, string key, Clue inventory
     }
 
     cout << "\n[Holmes liga essa pista ao assassinato]\n";
+    cout << "\nPara prosseguir aperte Enter..." << endl;
 
     //cout << "\nProgresso da investigacao: " << realCluesSolved << "/3 pistas principais.\n";
     table.input(key, clue);
@@ -502,6 +508,7 @@ void crimeScene(){
 }
 
 //---------------[Interrogatorios]---------------
+
 // ===============[Interrogatorio Eleanor]==============
 void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
   int op = -1, op2 = -1;
@@ -1609,6 +1616,7 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
   int op = -1;
   int sub_op;
   do{
+    pausa();
     limparTela();
     cout<<"\n[COZINHA]\n"<< endl;
     
@@ -1756,7 +1764,9 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
         if(realCluesSolved >= 3){
           accusationMenu();
         }else{
+          pausa();
           cout << "\nHolmes ainda nao possui evidencias suficientes.\n"; //"evidencias" nao precisa de ajuste aqui, mas vou ajustar para consistencia
+          pausa();
         }
         break;
       case 0:
