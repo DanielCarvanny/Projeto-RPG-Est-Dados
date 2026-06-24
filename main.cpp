@@ -29,6 +29,7 @@ struct Clue { //Estrutura da Pista
   string description;
   string question;
   string options[4];
+  int optionChosen = -1;
   int correctReponse;
   
   bool resolvida = false;
@@ -269,19 +270,97 @@ class Grafo{
       cout << "\n[Sherlock nao possui conexoes sobre essa pista ainda.]" << endl;
     }
 
-    void showMentalWeb(TabelaHash &table){
-      cout << "\n=== PALACIO MENTAL: REDE DE CONEXOES ===\n" << endl;
-      for(int i = 0 ; i < numVertices ; i++){
-        if(table.search(vertices[i]->idClue).descoberta){
-          cout<<"\n["<<vertices[i]->idClue<<"]\n";
-          for(int j = 0 ; j < vertices[i]->numConnections ; j++){
-            cout << "  ---> Conecta-se com: " << vertices[i]->connection[j]->idClue << endl;
-          }
-        }
-        cout<< "Presione Enter para continuar..." << endl;
-        pausa();
+    void printDFS(int nodeIdx, TabelaHash &table, bool visited[], string prefix, bool isLast) {
+      if (visited[nodeIdx]) {
+        Clue c = table.search(vertices[nodeIdx]->idClue);
+        string title = c.descoberta ? c.title : "??? Pista Desconhecida ???";
+        cout << prefix << (isLast ? "\\-- " : "|-- ") << "[" << title << "] (Conexao Dupla/Circular)" << endl;
+        return;
       }
-      cout << "\n===========================================" << endl;
+      
+      visited[nodeIdx] = true;
+      Clue c = table.search(vertices[nodeIdx]->idClue);
+      string title = c.descoberta ? c.title : "??? Pista Desconhecida ???";
+      
+      cout << prefix << (isLast ? "\\-- " : "|-- ") << "[" << title << "]" << endl;
+      
+      string childPrefix = prefix + (isLast ? "    " : "|   ");
+      int numChildren = vertices[nodeIdx]->numConnections;
+      
+      for(int i = 0; i < numChildren; i++) {
+        int childIdx = -1;
+        for(int k=0; k < numVertices; k++) {
+           if(vertices[k] == vertices[nodeIdx]->connection[i]) {
+              childIdx = k;
+              break;
+           }
+        }
+        if(childIdx != -1) {
+          printDFS(childIdx, table, visited, childPrefix, (i == numChildren - 1));
+        }
+      }
+    }
+
+    void showMentalWeb(TabelaHash &table) {
+      cout << "\n=== PALACIO MENTAL: FLUXOGRAMA DE DEDUCOES ===\n" << endl;
+      
+      bool visited[MAX_VERTICES] = {false};
+      bool hasIncoming[MAX_VERTICES] = {false};
+      
+      // Calculate in-degrees
+      for(int i = 0; i < numVertices; i++) {
+        for(int j = 0; j < vertices[i]->numConnections; j++) {
+           for(int k=0; k < numVertices; k++) {
+              if(vertices[k] == vertices[i]->connection[j]) {
+                 hasIncoming[k] = true;
+                 break;
+              }
+           }
+        }
+      }
+      
+      // Print trees starting from roots
+      for(int i = 0; i < numVertices; i++) {
+        if(!hasIncoming[i]) {
+           Clue c = table.search(vertices[i]->idClue);
+           string title = c.descoberta ? c.title : "??? Pista Desconhecida ???";
+           cout << "\n[" << title << "]" << endl;
+           visited[i] = true;
+           
+           int numChildren = vertices[i]->numConnections;
+           for(int j = 0; j < numChildren; j++) {
+             int childIdx = -1;
+             for(int k=0; k < numVertices; k++) {
+                if(vertices[k] == vertices[i]->connection[j]) {
+                   childIdx = k;
+                   break;
+                }
+             }
+             if(childIdx != -1) {
+               printDFS(childIdx, table, visited, "", (j == numChildren - 1));
+             }
+           }
+        }
+      }
+      
+      // Print isolated or completely circular nodes if any are unvisited
+      bool hasIsolated = false;
+      for(int i = 0; i < numVertices; i++) {
+        if(!visited[i]) {
+          if(!hasIsolated) {
+             cout << "\n=== Pistas Secundarias / Ciclicas ===" << endl;
+             hasIsolated = true;
+          }
+          Clue c = table.search(vertices[i]->idClue);
+          string title = c.descoberta ? c.title : "??? Pista Desconhecida ???";
+          cout << "[" << title << "]" << endl;
+          visited[i] = true;
+        }
+      }
+      
+      cout << "\nPressione Enter para voltar ao menu..." << endl;
+      cin.ignore();
+      pausa();
     }
 };
 
@@ -328,18 +407,19 @@ bool checkAnswer(Clue &pista){ //Verifica Pista
     cout << i + 1 << " - " << pista.options[i] << endl;
   }
 
-  cin >> response;
+  cin.ignore();
   while(response < 1 || response > 4) {
-    cout << "Opcao invalida. Tente novamente: ";
+    cout << "Opcao invalida. Tente novamente: "<<endl;
+    cout << "Opcao: ";
     cin >> response;
   }
-  cin.ignore();
 
   cout << "\nHolmes observa a cena em silencio.\n";
   cout << "\"Interessante... muito interessante.\"\n";
 
   pista.resolvida = true;
   pista.description += "\n\n[Sua Deducao]: " + pista.options[response - 1];
+  pista.optionChosen = response - 1;
 
   if(response == pista.correctReponse){
     return true;
@@ -378,19 +458,29 @@ void investigateClue(TabelaHash &table, Grafo &graph, string key, Clue inventory
     if(correct && clue.realClue){
       realCluesSolved++;
     }
-
-    // Retorno VISUAL garantido para o jogador, mantendo o mistério e a ilusão
-    showDeduction(graph, table, key); 
-    cout << "\n[Holmes liga essa pista ao assassinato]\n";
-
-    cout << "\nPara prosseguir aperte Enter..." << endl;
-    pausa();
-    limparTela();
+  } else {
+    // Se não tem quiz (Fato Narrativo), Holmes simplesmente absorve a prova
+    cout << "\nHolmes reflete sobre essa constatacao inegavel...\n";
+    if (clue.realClue) {
+       realCluesSolved++;
+    }
   }
+
+  // Retorno VISUAL garantido para o jogador, mantendo o mistério e a ilusão
+  /*
+    Está bugado!
+    showDeduction(graph, table, key);
+  */
+  cout << "\n[Holmes liga essa pista ao assassinato]\n";
+
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
+  limparTela();
 
   table.input(key, clue);
   addInventory(inventory, totalClues, clue);
 }
+
 
 //---------------[Historia]---------------
 void introStory(){
@@ -563,6 +653,8 @@ void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int
     else if(op2!=0 && op2!=1 && op2!=2){
       cout<<"Opcao invalida"<<endl;
       cout<<"Tente novamente"<<endl;
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
     }
     else if(op2 == 2){
       do{
@@ -629,7 +721,6 @@ void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int
             cout << "-- Tenho tomado remedios para dormir." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
-            investigateClue(table, graph, "alibi_eleanor", inventory, totalClues, realCluesSolved); 
           break;
           
           case 3:
@@ -771,6 +862,7 @@ void arthurInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
 
       cout << "\nPara prosseguir aperte Enter..." << endl;
       pausa();
+      investigateClue(table, graph, "tensao_arthur", inventory, totalClues, realCluesSolved);
     }
     else if(op2!=0 && op2!=1 && op2!=2){
       cout<<"Opcao invalida"<<endl;
@@ -830,6 +922,7 @@ void arthurInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             cout << "-- Revisando planilhas ate a chegada da policia." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
+            investigateClue(table, graph, "alibi_arthur", inventory, totalClues, realCluesSolved);
           break;
 
           case 3:
@@ -997,7 +1090,8 @@ void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
         cout << "=== Perguntas ===" << endl;
         cout<<" 1. Como era sua relacao com seu pai?" << endl; 
         cout <<" 2. Onde estava durante o assassinato?" << endl;
-        if(cachimbo_alfredo.descoberta && cigarros_turcos.descoberta){
+        cout<<" 3. Voce ouviu alguma coisa suspeita?" << endl;
+        if(cachimbo_alfredo.descoberta && cigarros_turcos.descoberta && dedos_amarelados.descoberta){
           cout<<" 4. Voce possui marcas em seus dedos de fumo compulsivo. explique-se." << endl;
         }
         if(cinzeiro_jardim.descoberta){
@@ -1006,7 +1100,6 @@ void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
         if(portao_ferro.descoberta){
           cout<<" 6. O senhor confessou ter usado um lenco para forcar o portao." << endl;
         }
-        cout<<" 3. Voce ouviu alguma coisa suspeita?" << endl;
         cout<<" 0. Se retirar"<<endl;
         cout<<"Opcao: ";
         cin>>op;
@@ -1057,7 +1150,8 @@ void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             cout << "Holmes percebe um cheiro de cigarro em sua roupa." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
-            break;
+            investigateClue(table, graph, "alibi_edward", inventory, totalClues, realCluesSolved);
+          break;
 
           case 3:
             limparTela();
@@ -1081,8 +1175,7 @@ void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
             investigateClue(table, graph, "passos_leves", inventory, totalClues, realCluesSolved);
-            investigateClue(table, graph, "alibi_edward", inventory, totalClues, realCluesSolved);
-            break;
+          break;
 
           case 4:
             limparTela();
@@ -1184,7 +1277,7 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
 
       investigateClue(table, graph, "frieza_violet", inventory, totalClues, realCluesSolved);
       investigateClue(table, graph, "adrenalina_violet", inventory, totalClues, realCluesSolved);
-      investigateClue(table, graph, "vinho_unhas", inventory, totalClues, realCluesSolved);
+      investigateClue(table, graph, "unhas_violet", inventory, totalClues, realCluesSolved);
     }
     else if(op2!=0 && op2!=1 && op2!=2){
       cout<<"Opcao invalida"<<endl;
@@ -1197,7 +1290,7 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
         Clue alibi_violet = table.search("alibi_violet");
         Clue faca_crime = table.search("faca_crime");
         Clue sangue_pia = table.search("sangue_pia");
-        Clue vinho_unhas = table.search("vinho_unhas");
+        Clue unhas_violet = table.search("unhas_violet");
 
         cout << "=== Perguntas ===" << endl;
         cout<<" 1. Como era sua relacao com seu pai?" << endl; 
@@ -1213,7 +1306,7 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
         if(tirano_domestico.descoberta){
           cout<<" 6. Voce disse que ele so se importava com voce?" << endl;
         }
-        if(faca_crime.descoberta && sangue_pia.descoberta && vinho_unhas.descoberta){
+        if(faca_crime.descoberta && sangue_pia.descoberta && unhas_violet.descoberta){
           cout<<" 7. Vejo resquicios de vinho tinto sob suas unhas e na barra de seu vestido. Alem disso, a pia onde o assassino limpou o sangue exala um perfume de lavanda identico ao que sinto vindo de voce agora. Como explica essa proximidade com a cena, senhorita Violet?" << endl;
         }
         cout<<" 0. Se retirar"<<endl;
@@ -1243,8 +1336,6 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             cout << "-- Nossa relacao era maravilhosa. Acredito que era a unica que ele realmente se importava." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
-
-            investigateClue(table, graph, "perdeu_medo", inventory, totalClues, realCluesSolved);
           break;
 
           case 2:
@@ -1297,10 +1388,10 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             pausa();
             limparTela();
             cout<<"=== VIOLET WHITMORE ==="<<endl;
-            cout << "A sala inteira permanece em silencio por alguns segundos." << endl; //"silencio" nao precisa de ajuste aqui, mas vou ajustar para consistencia
+            cout << "A sala inteira permanece em silencio por alguns segundos." << endl; 
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
-            investigateClue(table, graph, "tirano_domestico", inventory, totalClues, realCluesSolved);
+            investigateClue(table, graph, "perdeu_medo", inventory, totalClues, realCluesSolved);
           break;
 
           case 5:
@@ -1338,6 +1429,7 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             cout << "-- Alguem finalmente perdeu o medo dele." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
+            investigateClue(table, graph, "tirano_domestico", inventory, totalClues, realCluesSolved);
             investigateClue(table, graph, "karma_violet", inventory, totalClues, realCluesSolved);
           break;
 
@@ -1426,6 +1518,7 @@ void alfredInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
       cout << "\nPara prosseguir aperte Enter..." << endl;
       pausa();
       limparTela();
+      investigateClue(table, graph, "fisico_alfred", inventory, totalClues, realCluesSolved);
     }
     else if(op2!=0 && op2!=1 && op2!=2){
       cout<<"Opcao invalida"<<endl;
@@ -1488,6 +1581,7 @@ void alfredInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             cout << "-- Nao sai de la ate ouvir a correria dos policiais." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
+            investigateClue(table, graph, "alibi_alfred", inventory, totalClues, realCluesSolved);
             if(continuacao == 0){
               continuacao = 1;
             }
@@ -1570,6 +1664,7 @@ void interrogationScene(TabelaHash &table, Grafo &graph, Clue inventory[], int &
     cout<<" 0. Se retirar"<<endl;
     cout<<"Opcao: ";
     cin>> op;
+    limparTela();
 
     switch(op){
       case 1:
@@ -1609,28 +1704,42 @@ void interrogationScene(TabelaHash &table, Grafo &graph, Clue inventory[], int &
   }
 }
 
+// ---------------[Final Errado]---------------
+void wrongEnding(string suspect, Clue inventory[], int &totalClues){
+  cout << "Sherlock reunia todos." << endl;
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
+  limparTela();
 
-//---------------[Final]---------------
-void bestEnding(){
-  cout << "Sherlock reunia todos." << endl; //"reunia" nao precisa de ajuste aqui, mas vou ajustar para consistencia
+  cout << "E explica com base nas suas provas:" << endl;
+  for(int i = 0; i < totalClues; i++){
+    if(inventory[i].descoberta){
+      cout << "- " << inventory[i].title << endl;
+    }
+  }
+}
+
+// ---------------[Final Certo]---------------
+void bestEnding(Clue inventory[], int &totalClues){
+  cout << "Sherlock reunia todos." << endl;
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
+  limparTela();
+
+  cout << "E explica com base nas suas provas:" << endl;
+  for(int i = 0; i < totalClues; i++){
+    if(inventory[i].descoberta){
+      cout << "- " << inventory[i].title << endl;
+    }
+  }  
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
-  cout << "E explica:" << endl;
-  cout << "- as facadas eram exageradas demais;" << endl;
-  cout << "- a cena foi manipulada;" << endl;
-  cout << "- o assassino era menor;" << endl;
-  cout << "- alguem lavou as maos;" << endl;
-  cout << "- passos leves;" << endl;
-  cout << "- ausencia de emocao genuina." << endl;
+  cout << "Entao Holmes encara Violet." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
-  cout << "Entao Holmes encara Violet." << endl; //"Entao" nao precisa de ajuste aqui, mas vou ajustar para consistencia
-  cout << "\nPara prosseguir aperte Enter..." << endl;
-  pausa();
-
-  cout << "E ela..." << endl; //"..." nao precisa de ajuste aqui, mas vou ajustar para consistencia
+  cout << "E ela..." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
@@ -1650,27 +1759,28 @@ void bestEnding(){
   cout << endl << "===== FIM =====" << endl;
 };
 
+// Substituido
 //---------------[Menus Acusacoes]---------------
-void accusationMenu(){ //Cena de acusacao
-  int opt = 0;
-  limparTela();
+// void accusationMenu(){ //Cena de acusacao
+//   int opt = 0;
+//   limparTela();
 
-  cout << "\nQuem e o assassino?\n"; //"e" nao precisa de ajuste aqui, mas vou ajustar para consistencia
-  cout << "1 - Eleanor\n2 - Arthur\n3 - Edward\n4 - Violet\n5 - Alfred\n";
+//   cout << "\nQuem e o assassino?\n"; 
+//   cout << "1 - Eleanor\n2 - Arthur\n3 - Edward\n4 - Violet\n5 - Alfred\n";
 
-  cin >> opt;
+//   cin >> opt;
 
-  if(opt == 4){
-    cout << "\nSherlock observa Violet em silencio...\n";
-    cout << "Ela sorri.\n";
+//   if(opt == 4){
+//     cout << "\nSherlock observa Violet em silencio...\n";
+//     cout << "Ela sorri.\n";
     
-    bestEnding();
-  }
-  else{
-    cout << "\nHolmes fecha os olhos.\n";
-    cout << "A acusacao nao se sustenta.\n";
-  }
-}
+//     //bestEnding();
+//   }
+//   else{
+//     cout << "\nHolmes fecha os olhos.\n";
+//     cout << "A acusacao nao se sustenta.\n";
+//   }
+// }
 
 //---------------[Menu Cozinha]---------------
 void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClues, int &realCluesSolved){ //Menu da cena da cozinha
@@ -1698,7 +1808,7 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
     cin.ignore();
       
     switch(op){
-      case 1: { // Pistas da Faca
+      case 1: // Pistas da Faca
         cout << "\nAnalisando a faca..." << endl;
         cout << "1. Examinar limpeza da lamina" << endl;
         cout << "2. Examinar angulo do golpe" << endl;
@@ -1710,19 +1820,15 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
 
         switch(sub_op) {
             case 1:
-                investigateClue(table, graph, "faca_crime", inventory, totalClues, realCluesSolved); 
-              break;
+              investigateClue(table, graph, "faca_crime", inventory, totalClues, realCluesSolved); 
+            break;
             case 2:
-                investigateClue(table, graph, "angulo_facada", inventory, totalClues, realCluesSolved);
-              break;
+              investigateClue(table, graph, "angulo_facada", inventory, totalClues, realCluesSolved);
+            break;
             case 3:
-                investigateClue(table, graph, "microfissuras_cabo", inventory, totalClues, realCluesSolved);
-              break;
+              investigateClue(table, graph, "microfissuras_cabo", inventory, totalClues, realCluesSolved);
+            break;
             case 0:
-              cout << "Voltando ao menu da cozinha..." << endl;
-              cout << "\nPara prosseguir aperte Enter..." << endl;
-              pausa();
-              limparTela();
             break;
             
             default:
@@ -1732,7 +1838,12 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
               limparTela();
             break;
         }
-      }
+        cout << "Voltando ao menu da cozinha..." << endl;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        limparTela();
+      break;
+
       case 2:
         investigateClue(table, graph, "cadeira_caida", inventory, totalClues, realCluesSolved);
         break;
@@ -1756,17 +1867,18 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
                 investigateClue(table, graph, "cheiro_lavanda", inventory, totalClues, realCluesSolved);
                 break;
             case 0:
-              cout << "Voltando ao menu da cozinha..." << endl;
+            break;
+            default:
+              cout << "Opcao invalida." << endl;
               cout << "\nPara prosseguir aperte Enter..." << endl;
               pausa();
               limparTela();
             break;
-            default:
-                cout << "Opcao invalida." << endl;
-                cout << "\nPara prosseguir aperte Enter..." << endl;
-                pausa();
-                limparTela();
         }
+        cout << "Voltando ao menu da cozinha..." << endl;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        limparTela();
         break;
       }
       case 5:
@@ -1820,6 +1932,273 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
     }
   } while(op != 0);
 }
+// ---------------[Árvore]---------------
+struct NoArvore{
+  string question;
+  string suspect;
+  NoArvore* esquerda = NULL; // Resposta 'Sim'
+  NoArvore* direita = NULL; // Resposta 'Não'
+};
+
+class Arvore{
+  private:
+    NoArvore* raiz;
+    Clue selectedEvidence[10];
+    int evidenceCount;
+    
+    bool temProva(int idBuscado) {
+        for(int i = 0; i < evidenceCount; i++) {
+          if(selectedEvidence[i].idClue == idBuscado) 
+            return true; 
+        }
+        return false;
+    }
+  
+  public:
+    Arvore(){
+      raiz = NULL;
+      evidenceCount = 0;
+    }
+
+    void criarArvore(TabelaHash &table){
+      if(raiz != NULL) return;
+      raiz = new NoArvore;
+
+      Clue faca = table.search("faca_crime");                   // 1
+      Clue angulo = table.search("angulo_facada");              // 2
+      Clue micro = table.search("microfissuras_cabo");          // 3
+      Clue cadeira = table.search("cadeira_caida");             // 4
+      Clue taca = table.search("taca_vinho");                   // 5
+      Clue sangue = table.search("sangue_pia");                 // 6
+      Clue lavanda = table.search("cheiro_lavanda");            // 7
+      Clue lenco = table.search("lenco_ensanguentado");         // 8
+      Clue cigarro = table.search("cigarros_turcos");           // 9
+      Clue discussao = table.search("discussao_arthur");        // 10
+      Clue frasco = table.search("frasco_antidepressivo");      // 11
+      Clue traicao = table.search("suspeita_traicao");          // 12
+      Clue passos = table.search("passos_leves");               // 13
+      Clue dedos = table.search("dedos_amarelados");            // 14
+      Clue portao = table.search("portao_ferro");               // 15
+      Clue cinzeiro = table.search("cinzeiro_jardim");          // 16
+      Clue sintomas = table.search("sintomas_eleanor");         // 17
+      Clue testamento = table.search("testamento_sucessao");    // 18
+      Clue invisivel = table.search("mordomo_invisivel");       // 19
+      Clue cachimbo = table.search("cachimbo_alfred");          // 20
+      Clue fones = table.search("fones_ouvido");                // 21
+      Clue frieza = table.search("frieza_violet");              // 22
+      Clue perdeu_medo = table.search("perdeu_medo");           // 23
+      Clue adrenalina = table.search("adrenalina_violet");      // 24
+      Clue unhas = table.search("unhas_violet");                // 25
+      Clue alibi_ele = table.search("alibi_eleanor");           // 26
+      Clue alibi_ed = table.search("alibi_edward");             // 27
+      Clue alibi_vi = table.search("alibi_violet");             // 28
+      Clue tirano = table.search("tirano_domestico");           // 29
+      Clue karma = table.search("karma_violet");                // 30
+      Clue tensao = table.search("tensao_arthur");              // 31
+      Clue alibi_ar = table.search("alibi_arthur");             // 32
+      Clue fisico_al = table.search("fisico_alfred");           // 33
+      Clue alibi_al = table.search("alibi_alfred");             // 34
+
+      if(!temProva(faca.idClue)) {
+          raiz->question = "Falta a arma do crime no dossie. A acusacao e invalida sem a faca.";
+          raiz->esquerda = new NoArvore; raiz->esquerda->suspect = "Inconclusivo";
+          raiz->direita = new NoArvore; raiz->direita->suspect = "Inconclusivo";
+          return;
+      }
+
+      if(faca.optionChosen == 0 || angulo.optionChosen != 2) {
+          raiz->question = "O ataque parece calculista. A fortuna do testamento foi a verdadeira motivacao do crime? (1-Sim/2-Nao)";
+          raiz->esquerda = new NoArvore; 
+          raiz->direita = new NoArvore;
+
+          if(temProva(10) && discussao.optionChosen == 1 && temProva(31) && tensao.optionChosen == 1 && temProva(32) && alibi_ar.optionChosen == 1) {
+              raiz->esquerda->question = "Arthur tem motivos e furia retida. Foi ele quem encomendou a morte do pai? (1-Sim/2-Nao)";
+              raiz->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->suspect = "Arthur";
+              raiz->esquerda->direita = new NoArvore; raiz->esquerda->direita->suspect = "Inconclusivo";
+          } else {
+              raiz->esquerda->question = "Descartando Arthur, a viuva Eleanor seria a mandante do crime para garantir a heranca? (1-Sim/2-Nao)";
+              raiz->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->suspect = "Eleanor";
+              raiz->esquerda->direita = new NoArvore; raiz->esquerda->direita->suspect = "Inconclusivo";
+          }
+
+          if(temProva(19) && invisivel.optionChosen == 1 && temProva(34) && alibi_al.optionChosen == 1 && fisico_al.optionChosen != 2) {
+              raiz->direita->question = "O mordomo Alfred cometeu o crime por decadas de humilhacao e odio de classe? (1-Sim/2-Nao)";
+              raiz->direita->esquerda = new NoArvore; raiz->direita->esquerda->suspect = "Alfred";
+              raiz->direita->direita = new NoArvore; raiz->direita->direita->suspect = "Inconclusivo";
+          } else {
+              raiz->direita->question = "As evidencias isentam Alfred. A teoria de um assassinato profissional desmorona sem provas materiais.";
+              raiz->direita->esquerda = new NoArvore; raiz->direita->esquerda->suspect = "Inconclusivo";
+              raiz->direita->direita = new NoArvore; raiz->direita->direita->suspect = "Inconclusivo";
+          }
+      } 
+      else {
+          raiz->question = "O ataque foi caotico e passional. O assassino forjou a cena para enganar a policia? (1-Sim/2-Nao)";
+          raiz->esquerda = new NoArvore; 
+          raiz->direita = new NoArvore;
+
+          if(temProva(9) && cigarro.optionChosen == 2 && temProva(11) && frasco.optionChosen == 2) { 
+              raiz->direita->question = "As bitucas e remedios apontam para Edward. Ele teve um surto e atacou o pai? (1-Sim/2-Nao)";
+              if(!temProva(16) || cinzeiro.optionChosen != 2) { 
+                  raiz->direita->esquerda = new NoArvore; raiz->direita->esquerda->suspect = "Edward";
+                  raiz->direita->direita = new NoArvore; raiz->direita->direita->suspect = "Inconclusivo";
+              } else {
+                  raiz->direita->question = "Edward estava no jardim. A bituca foi plantada para incrimina-lo, derrubando sua culpa.";
+                  raiz->direita->esquerda = new NoArvore; raiz->direita->esquerda->suspect = "Inconclusivo";
+                  raiz->direita->direita = new NoArvore; raiz->direita->direita->suspect = "Inconclusivo";
+              }
+          } else {
+              raiz->direita->question = "A cena foi forjada. No entanto, o dossie carece de provas para apontar o culpado.";
+              raiz->direita->esquerda = new NoArvore; raiz->direita->esquerda->suspect = "Inconclusivo";
+              raiz->direita->direita = new NoArvore; raiz->direita->direita->suspect = "Inconclusivo";
+          }
+
+          if(temProva(7) && lavanda.optionChosen == 1 && temProva(13) && passos.optionChosen == 2) { 
+              raiz->esquerda->question = "As pistas apontam para as mulheres da casa. A motivacao seria ciume por traicao? (1-Sim/2-Nao)";
+              raiz->esquerda->esquerda = new NoArvore; 
+              raiz->esquerda->direita = new NoArvore;
+
+              if(temProva(12) && traicao.optionChosen == 1 && temProva(17) && sintomas.optionChosen == 1) {
+                  raiz->esquerda->esquerda->question = "Eleanor mentiu o alibi e abusa de sedativos. Ela atacou o marido por ciume? (1-Sim/2-Nao)";
+                  raiz->esquerda->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->esquerda->suspect = "Eleanor";
+                  raiz->esquerda->esquerda->direita = new NoArvore; raiz->esquerda->esquerda->direita->suspect = "Inconclusivo";
+              } else {
+                  raiz->esquerda->esquerda->question = "Eleanor e fragil demais. Sua falta de forca descarta a brutalidade que quebrou a faca.";
+                  raiz->esquerda->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->esquerda->suspect = "Inconclusivo";
+                  raiz->esquerda->esquerda->direita = new NoArvore; raiz->esquerda->esquerda->direita->suspect = "Inconclusivo";
+              }
+
+              raiz->esquerda->direita->question = "Restando apenas o odio familiar, Violet forjou friamente o seu alibi usando os fones? (1-Sim/2-Nao)";
+              raiz->esquerda->direita->esquerda = new NoArvore;
+              raiz->esquerda->direita->direita = new NoArvore;
+
+              if(temProva(22) && frieza.optionChosen == 2 && temProva(23) && perdeu_medo.optionChosen == 2 && temProva(24) && adrenalina.optionChosen == 1 && temProva(29) && tirano.optionChosen != -1 && temProva(30) && karma.optionChosen == 2 && temProva(28) && alibi_vi.optionChosen == 1 && temProva(21) && fones.optionChosen == 1) {
+                  raiz->esquerda->direita->esquerda->question = "Violet e a suspeita final. Existe prova fisica no dossie que a conecte ao sangue? (1-Sim/2-Nao)";
+                  
+                  raiz->esquerda->direita->esquerda->esquerda = new NoArvore;
+                  raiz->esquerda->direita->esquerda->direita = new NoArvore;
+                  
+                  if(temProva(25) && unhas.optionChosen == 2) { 
+                      raiz->esquerda->direita->esquerda->esquerda->suspect = "Violet"; 
+                      raiz->esquerda->direita->esquerda->direita->suspect = "Inconclusivo";
+                  } else {
+                      raiz->esquerda->direita->esquerda->esquerda->question = "A deducao e perfeita, mas sem o sangue nas unhas o juiz nao a condenara.";
+                      raiz->esquerda->direita->esquerda->esquerda->esquerda = new NoArvore; raiz->esquerda->direita->esquerda->esquerda->esquerda->suspect = "Inconclusivo";
+                      raiz->esquerda->direita->esquerda->esquerda->direita = new NoArvore; raiz->esquerda->direita->esquerda->esquerda->direita->suspect = "Inconclusivo";
+                  }
+              } else {
+                  raiz->esquerda->direita->esquerda->question = "Faltam evidencias da frieza de Violet no dossie. A acusacao psicologica e fraca demais.";
+                  raiz->esquerda->direita->esquerda->esquerda = new NoArvore; raiz->esquerda->direita->esquerda->esquerda->suspect = "Inconclusivo";
+                  raiz->esquerda->direita->esquerda->direita = new NoArvore; raiz->esquerda->direita->esquerda->direita->suspect = "Inconclusivo";
+              }
+          } else {
+              raiz->esquerda->question = "Sem as provas de passos e perfume, sua deducao contra as mulheres nao tem base.";
+              raiz->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->suspect = "Inconclusivo";
+              raiz->esquerda->direita = new NoArvore; raiz->esquerda->direita->suspect = "Inconclusivo";
+          }
+      }
+    }
+
+    void montarDossie(Clue inventory[], int totalClues){
+      evidenceCount = 0;
+      bool added[40] = {false};
+      
+      while(true){
+        limparTela();
+        cout << "\n=== MONTAGEM DO DOSSIE (" << evidenceCount << "/10) ===" << endl;
+        cout << "Para formular a acusacao final, voce deve selecionar entre 8 e 10 provas materiais." << endl;
+        cout << "Pistas no seu inventario:\n" << endl;
+        
+        for(int i = 0; i < totalClues; i++){
+          cout << i + 1 << ". " << inventory[i].title;
+          if(added[i]) cout << " [SELECIONADA]";
+          cout << endl;
+        }
+        
+        cout << "\nDigite o numero da pista para adicionar/remover, ou 0 para CONCLUIR O DOSSIE: ";
+        int choice;
+        cin >> choice;
+        cin.ignore();
+        
+        if(choice == 0){
+          if(evidenceCount >= 8 && evidenceCount <= 10){
+            break;
+          } else {
+            cout << "\nVoce precisa selecionar entre 8 e 10 pistas para um processo valido!" << endl;
+            pausa();
+          }
+        } else if(choice > 0 && choice <= totalClues){
+          int index = choice - 1;
+          if(!added[index]){
+            if(evidenceCount < 10){
+              selectedEvidence[evidenceCount] = inventory[index];
+              added[index] = true;
+              evidenceCount++;
+            } else {
+              cout << "\nLimite maximo de 10 provas atingido!" << endl;
+              pausa();
+            }
+          } else {
+            added[index] = false;
+            for(int i=0; i<evidenceCount; i++){
+              if(selectedEvidence[i].idClue == inventory[index].idClue){
+                for(int j=i; j<evidenceCount-1; j++){
+                  selectedEvidence[j] = selectedEvidence[j+1];
+                }
+                evidenceCount--;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    void iniciarAcusacao(Clue inventory[], int totalClues){
+      NoArvore* atual = raiz;
+      string suspect = "";
+      int op = -1;
+
+      while(atual != NULL){
+        if(atual->suspect != ""){
+          suspect = atual->suspect;
+
+          if(suspect == "Violet"){bestEnding(selectedEvidence, evidenceCount);}
+          else if(suspect == "Eleanor"){wrongEnding(atual->suspect, selectedEvidence, evidenceCount);}
+          else if(suspect == "Arthur"){wrongEnding(atual->suspect, selectedEvidence, evidenceCount);}
+          else if(suspect == "Edward"){wrongEnding(atual->suspect, selectedEvidence, evidenceCount);}
+          else{
+            cout<< "Acusacao inconclusiva. Nao foi possivel identificar o assassino." << endl;
+            pausa();
+          }
+          break;
+        }
+        else{
+          op = -1;
+          while(op != 1 && op != 2){
+            cout << atual->question << endl;
+            cout << "1. Sim" << endl;
+            cout << "2. Nao" << endl;
+            cout << "Opcao: ";
+            cin >> op;
+            cin.ignore();
+
+            if(op == 1){
+              atual = atual->esquerda;
+            }
+            else if(op == 2){
+              atual = atual->direita;
+            }
+            else{
+              cout << "Opcao invalida. Tente novamente." << endl;
+              cout << "Para prosseguir aperte Enter..." << endl;
+              pausa();
+              limparTela();
+            }
+          }
+        }
+      }
+    }
+};
 
 //---------------[Menu INVESTIGACAO]---------------
 void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
@@ -1846,16 +2225,49 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
         interrogationScene(table, graph, inventory, totalClues, realCluesSolved);
       break;
       case 3:
-        if(realCluesSolved >= 3){
-          accusationMenu();
+        if(realCluesSolved >= 10){
+          Arvore tree;
+          tree.montarDossie(inventory, totalClues);
+          tree.criarArvore(table);
+          tree.iniciarAcusacao(inventory, totalClues);
         }else{
           pausa();
-          cout << "\nHolmes ainda nao possui evidencias suficientes.\n"; //"evidencias" nao precisa de ajuste aqui, mas vou ajustar para consistencia
+          cout << "\nHolmes ainda nao possui evidencias suficientes.\n";
           pausa();
         }
       break;
       case 4:
         graph.showMentalWeb(table);
+      break;
+      case 67: {
+        string keys[] = {
+          "faca_crime", "angulo_facada", "microfissuras_cabo", "cadeira_caida", "taca_vinho",
+          "sangue_pia", "cheiro_lavanda", "lenco_ensanguentado", "cigarros_turcos",
+          "discussao_arthur", "frasco_antidepressivo", "suspeita_traicao", "passos_leves",
+          "dedos_amarelados", "portao_ferro", "cinzeiro_jardim", "sintomas_eleanor",
+          "testamento_sucessao", "mordomo_invisivel", "cachimbo_alfred", "fones_ouvido",
+          "frieza_violet", "perdeu_medo", "adrenalina_violet", "unhas_violet",
+          "alibi_eleanor", "alibi_edward", "alibi_violet", "tirano_domestico", "karma_violet",
+          "tensao_arthur", "alibi_arthur", "fisico_alfred", "alibi_alfred"
+        };
+        for(int i = 0; i < 34; i++) {
+          Clue c = table.search(keys[i]);
+          if(!c.descoberta && c.idClue != 0) {
+            c.descoberta = true;
+            c.resolvida = true; 
+            table.input(keys[i], c);
+            inventory[totalClues] = c;
+            totalClues++;
+            if(c.realClue) {
+              realCluesSolved++;
+            }
+          }
+        }
+        cin.ignore();
+        cout << "\n[DEV CHEAT ATIVADO] Todas as 34 pistas foram completamente desbloqueadas e resolvidas!" << endl;
+        cout << "Para prosseguir aperte Enter..." << endl;
+        pausa();
+      }
       break;
       case 0:
         cout << "Voce foi incapaz de resolver o caso." << endl;
@@ -2019,10 +2431,10 @@ void createClues(TabelaHash &table){
         lenco_ensanguentado.description = "Um lenco de seda fina abandonado no chao. O tecido impecavel possui o monograma bordado 'E.W.'. Uma das pontas esta manchada de sangue recente. Na outra extremidade, ha manchas asperas e secas de um po marrom e alaranjado, com um distinto cheiro de metal oxidado.";
         lenco_ensanguentado.question = "A quem pertence o lenco encontrado na cena do crime?";
         lenco_ensanguentado.options[0] = "A Violet Whitmore";
-        lenco_ensanguentado.options[1] = "A Eleanor Whitmore (monograma E.W.)";
+        lenco_ensanguentado.options[1] = "A Eleanor Whitmore";
         lenco_ensanguentado.options[2] = "Ao mordomo Alfred";
         lenco_ensanguentado.options[3] = "A Edward Whitmore";
-        lenco_ensanguentado.correctReponse = 1;
+        lenco_ensanguentado.correctReponse = -1;
         lenco_ensanguentado.resolvida = false;
         lenco_ensanguentado.descoberta = false;
         lenco_ensanguentado.realClue = false;
@@ -2058,7 +2470,7 @@ void createClues(TabelaHash &table){
         discussao_arthur.options[1] = "Arthur foi excluido da linha de sucessao das empresas";
         discussao_arthur.options[2] = "Arthur queria vender a mansao da familia";
         discussao_arthur.options[3] = "Arthur se recusou a trabalhar na empresa";
-        discussao_arthur.correctReponse = 1;
+        discussao_arthur.correctReponse = -1;
         discussao_arthur.resolvida = false;
         discussao_arthur.descoberta = false;
         discussao_arthur.realClue = false;
@@ -2088,18 +2500,13 @@ void createClues(TabelaHash &table){
         Clue suspeita_traicao;
         suspeita_traicao.idClue = 12;
         suspeita_traicao.title = "Suspeita de Traicao";
-        suspeita_traicao.description = "Eleanor Whitmore revelou a Sherlock que suspeitava "
-                                        "que o marido Raymond estava tendo um caso extraconjugal. "
-                                        "Ela mencionou que essa intuicao a corroia ha meses "
-                                        "e que Raymond voltava tarde do trabalho constantemente, "
-                                        "cada vez mais distante. Esse ciume pode ser um poderoso "
-                                        "motivo passional para o crime.";
+        suspeita_traicao.description = "Eleanor Whitmore revelou a Sherlock sua forte suspeita de que Raymond mantinha um caso extraconjugal recente. Ela descreveu a intuicao corroendo-a ha semanas, alimentada pelos retornos cada vez mais tardios e distantes dele do trabalho.";
         suspeita_traicao.question = "Qual o possivel motivo de Eleanor para cometer o crime?";
         suspeita_traicao.options[0] = "Ela queria a heranca das empresas";
         suspeita_traicao.options[1] = "Ela suspeitava que Raymond a traia - motivo passional";
         suspeita_traicao.options[2] = "Ela foi chantageada por Arthur";
         suspeita_traicao.options[3] = "Ela nao tinha motivo algum";
-        suspeita_traicao.correctReponse = 1;
+        suspeita_traicao.correctReponse = -1;
         suspeita_traicao.resolvida = false;
         suspeita_traicao.descoberta = false;
         suspeita_traicao.realClue = false;
@@ -2140,7 +2547,7 @@ void createClues(TabelaHash &table){
         dedos_amarelados.options[1] = "Um sinal classico de fumante compulsivo.";
         dedos_amarelados.options[2] = "Ele tem uma doenca de figado";
         dedos_amarelados.options[3] = "E uma caracteristica genetica da familia";
-        dedos_amarelados.correctReponse = 1;
+        dedos_amarelados.correctReponse = -1;
         dedos_amarelados.resolvida = false;
         dedos_amarelados.descoberta = false;
         dedos_amarelados.realClue = false;
@@ -2152,17 +2559,13 @@ void createClues(TabelaHash &table){
         Clue portao_ferro;
         portao_ferro.idClue = 15;
         portao_ferro.title = "Portao de Ferro Emperrado";
-        portao_ferro.description = "Edward confessou que entrou na cozinha pelas portas dos fundos. "
-                                    "O portao de ferro do jardim estava emperrado, e ele usou "
-                                    "um lenco que encontrou no jardim para forca-lo e conseguir abrir. "
-                                    "Isso explica a mancha de ferrugem de metal velho encontrada no lenco "
-                                    "com monograma 'E.W.' que apareceu na cena do crime.";
+        portao_ferro.description = "Edward relata ter entrado furtivamente na cozinha pelas portas dos fundos. Segundo ele, o pesado portao de ferro do jardim estava emperrado e enferrujado, forcando-o a usar um pedaco de tecido qualquer que encontrou no chao para forcar o ferrolho e conseguir entrar sem sujar as maos.";
         portao_ferro.question = "Como a ferrugem foi parar no lenco de Eleanor?";
         portao_ferro.options[0] = "Eleanor tocou em metal velho antes do crime";
         portao_ferro.options[1] = "Edward usou o lenco para forcar um portao de ferro emperrado";
         portao_ferro.options[2] = "A ferrugem veio da faca do crime";
         portao_ferro.options[3] = "O lenco ja estava enferrujado quando foi comprado";
-        portao_ferro.correctReponse = 1;
+        portao_ferro.correctReponse = -1;
         portao_ferro.resolvida = false;
         portao_ferro.descoberta = false;
         portao_ferro.realClue = true;
@@ -2174,17 +2577,13 @@ void createClues(TabelaHash &table){
         Clue cinzeiro_jardim;
         cinzeiro_jardim.idClue = 16;
         cinzeiro_jardim.title = "Cinzeiro no Jardim";
-        cinzeiro_jardim.description = "Edward mencionou que fuma no jardim e que ha um cinzeiro "
-                                       "do lado de fora da casa. Ele acredita que alguem pegou "
-                                       "uma de suas bitucas de cigarro turco do cinzeiro e a colocou "
-                                       "na cozinha para incrimina-lo. Se for verdade, o assassino "
-                                       "conhece os habitos de Edward e planejou incrimina-lo.";
+        cinzeiro_jardim.description = "Inspecionando o lado de fora da casa, Holmes encontra o cinzeiro no jardim mencionado por Edward. Ele esta posicionado em uma area acessivel por qualquer pessoa e contem dezenas de bitucas recentes dos carissimos cigarros turcos de baunilha importados por Edward.";
         cinzeiro_jardim.question = "O que a bituca de cigarro na cozinha provavelmente significa?";
         cinzeiro_jardim.options[0] = "Edward fumou na cozinha durante o crime";
         cinzeiro_jardim.options[1] = "A vitima fumava cigarros turcos";
         cinzeiro_jardim.options[2] = "Alguem pegou a bituca do cinzeiro e plantou na cozinha para incriminar Edward";
         cinzeiro_jardim.options[3] = "O mordomo comprou os mesmos cigarros";
-        cinzeiro_jardim.correctReponse = 2;
+        cinzeiro_jardim.correctReponse = -1;
         cinzeiro_jardim.resolvida = false;
         cinzeiro_jardim.descoberta = false;
         cinzeiro_jardim.realClue = true;
@@ -2196,7 +2595,7 @@ void createClues(TabelaHash &table){
         Clue sintomas_eleanor;
         sintomas_eleanor.idClue = 17;
         sintomas_eleanor.title = "Sintomas Suspeitos de Eleanor";
-        sintomas_eleanor.description = "Ao observar Eleanor, Holmes nota detalhes sutis: ela apresenta uma forte sonolencia, os musculos das pernas possuem pequenos espasmos involuntarios e as pupilas estao dilatadas. Ela afirma estar sob o efeito de seus sedativos padrao para insonia.";
+        sintomas_eleanor.description = "Ao observar Eleanor, Holmes nota detalhes sutis: ela apresenta uma forte sonolencia pesada, agitacao involuntaria nos pes e espasmos musculares ocasionais nos dedos.";
         sintomas_eleanor.question = "O que os sintomas de Eleanor realmente indicam?";
         sintomas_eleanor.options[0] = "Ela esta sob efeito de sedativos como afirma";
         sintomas_eleanor.options[1] = "Ela apresenta sintomas de abuso de antidepressivos, nao de sedativos";
@@ -2256,7 +2655,7 @@ void createClues(TabelaHash &table){
         cachimbo_alfred.options[1] = "Nao - Alfred fuma cachimbo barato, nao cigarros turcos de luxo";
         cachimbo_alfred.options[2] = "Alfred nao fuma, o cheiro e de outra pessoa";
         cachimbo_alfred.options[3] = "O cheiro nao tem como ser identificado";
-        cachimbo_alfred.correctReponse = 1;
+        cachimbo_alfred.correctReponse = -1;
         cachimbo_alfred.resolvida = false;
         cachimbo_alfred.descoberta = false;
         cachimbo_alfred.realClue = false;
@@ -2341,20 +2740,20 @@ void createClues(TabelaHash &table){
     
     // --- Vinho nas Unhas ---
     {
-        Clue vinho_unhas;
-        vinho_unhas.idClue = 25;
-        vinho_unhas.title = "Vinho e Sangue nas Unhas de Violet";
-        vinho_unhas.description = "Watson chamou a atencao de Holmes para as maos de Violet. O forte perfume de lavanda recende em sua pele. Bem no canto da unha de seu polegar direito e na dobra da manga de seda repousam crostas microscopicas arroxeadas, exalando um levissimo odor fermentado de uva.";
-        vinho_unhas.question = "O que as crostas arroxeadas nas unhas de Violet indicam?";
-        vinho_unhas.options[0] = "Ela estava pintando as unhas antes do interrogatorio";
-        vinho_unhas.options[1] = "Sao residuos de tinta do bordado";
-        vinho_unhas.options[2] = "Sao crostas de vinho tinto seco, conectando-a a cena do crime";
-        vinho_unhas.options[3] = "Ela sofre de uma condicao medica nas unhas";
-        vinho_unhas.correctReponse = 2;
-        vinho_unhas.resolvida = false;
-        vinho_unhas.descoberta = false;
-        vinho_unhas.realClue = true;
-        table.input("vinho_unhas", vinho_unhas);
+        Clue unhas_violet;
+        unhas_violet.idClue = 25;
+        unhas_violet.title = "Unhas de Violet";
+        unhas_violet.description = "Watson chamou a atencao de Holmes para as maos de Violet. O forte cheiro de lavanda recende em sua pele. Bem no canto da unha de seu polegar direito e na dobra da manga de seda repousam crostas microscopicas arroxeadas, exalando um levissimo odor fermentado de uva.";
+        unhas_violet.question = "O que as crostas arroxeadas nas unhas de Violet indicam?";
+        unhas_violet.options[0] = "Ela estava pintando as unhas antes do interrogatorio";
+        unhas_violet.options[1] = "Sao residuos de tinta do bordado";
+        unhas_violet.options[2] = "Sao crostas de vinho tinto seco, conectando-a a cena do crime";
+        unhas_violet.options[3] = "Ela sofre de uma condicao medica nas unhas";
+        unhas_violet.correctReponse = 2;
+        unhas_violet.resolvida = false;
+        unhas_violet.descoberta = false;
+        unhas_violet.realClue = true;
+        table.input("unhas_violet", unhas_violet);
     }
     
     // --- Alibi Eleanor ---
@@ -2362,13 +2761,13 @@ void createClues(TabelaHash &table){
         Clue alibi_eleanor;
         alibi_eleanor.idClue = 26;
         alibi_eleanor.title = "Alibi de Eleanor";
-        alibi_eleanor.description = "Eleanor afirma que estava em seu quarto tomando sedativos para insonia. No entanto, mais tarde admitiu ter ido a cozinha para roubar os antidepressivos de Edward.";
+        alibi_eleanor.description = "Apos longa insistencia, Eleanor cede a sua mentira de que dormia com sedativos. 'Eu fui a cozinha aquela noite. Desci apenas para roubar os fortes antidepressivos de Edward, mas Raymond nao estava morto quando passei por la.'";
         alibi_eleanor.question = "Qual e a inconsistencia no alibi de Eleanor?";
         alibi_eleanor.options[0] = "Ela nunca esteve na cozinha";
         alibi_eleanor.options[1] = "Ela dizia estar no quarto, mas admitiu ter ido a cozinha";
         alibi_eleanor.options[2] = "Ela confessou o crime";
         alibi_eleanor.options[3] = "Seu alibi e perfeito e comprovado";
-        alibi_eleanor.correctReponse = 1;
+        alibi_eleanor.correctReponse = -1;
         alibi_eleanor.resolvida = false;
         alibi_eleanor.descoberta = false;
         alibi_eleanor.realClue = false;
@@ -2380,13 +2779,13 @@ void createClues(TabelaHash &table){
         Clue alibi_edward;
         alibi_edward.idClue = 27;
         alibi_edward.title = "Alibi de Edward";
-        alibi_edward.description = "Edward afirma que estava no jardim observando o ceu. Mais tarde admitiu ter entrado na cozinha para pegar gelo. Ele diz que viu que o pai nao estava la, ouviu passos de mulher no corredor e fugiu de volta para o jardim.";
+        alibi_edward.description = "Edward afirma de pes juntos que passou a noite inteira isolado no jardim e que nao presenciou nada alem da discussao do irmao mais cedo.";
         alibi_edward.question = "O que o depoimento de Edward ajuda a provar?";
         alibi_edward.options[0] = "Que ele e o assassino";
         alibi_edward.options[1] = "Que uma mulher estava no corredor na hora proxima ao crime";
         alibi_edward.options[2] = "Que o crime aconteceu no jardim";
         alibi_edward.options[3] = "Que ele nao tem ligacao nenhuma com o caso";
-        alibi_edward.correctReponse = 1;
+        alibi_edward.correctReponse = -1;
         alibi_edward.resolvida = false;
         alibi_edward.descoberta = false;
         alibi_edward.realClue = true;
@@ -2398,7 +2797,7 @@ void createClues(TabelaHash &table){
         Clue alibi_violet;
         alibi_violet.idClue = 28;
         alibi_violet.title = "Alibi de Violet";
-        alibi_violet.description = "Violet afirma estar no quarto de costura no fim do corredor com fones de ouvido.";
+        alibi_violet.description = "Violet afirma categoricamente estar trancada em seu quarto de costura no fim do corredor.";
         alibi_violet.question = "O alibi de Violet e confiavel?";
         alibi_violet.options[0] = "Sim, ela tem uma testemunha ocular";
         alibi_violet.options[1] = "Nao - multiplas evidencias a contradizem";
@@ -2416,13 +2815,13 @@ void createClues(TabelaHash &table){
         Clue tirano_domestico;
         tirano_domestico.idClue = 29;
         tirano_domestico.title = "'Tirano Domestico'";
-        tirano_domestico.description = "Quando confrontada sobre as microfissuras na faca, Violet revelou sua verdadeira opiniao sobre o pai: 'Meu pai era um tirano domestico, detetive Holmes. Ele esmagava a individualidade de todos nesta casa. Arthur virou um ganancioso previsivel, Edward um feixe de nervos ansioso e minha mae uma dependente de remedios.'";
+        tirano_domestico.description = "Ao ser perguntada sobre a personalidade familiar do pai, a expressao de Violet endurece: 'Meu pai era um tirano domestico, detetive. Ele esmagava a individualidade de todos nos. Arthur virou um ganancioso, Edward um doente ansioso e minha mae uma dependente de remedios.'";
         tirano_domestico.question = "Qual e a contradicao nas declaracoes de Violet sobre o pai?";
         tirano_domestico.options[0] = "Nao ha contradicao nenhuma";
         tirano_domestico.options[1] = "Ela disse que a relacao era maravilhosa, mas depois chamou o pai de tirano domestico";
         tirano_domestico.options[2] = "Ela nunca falou sobre o pai";
         tirano_domestico.options[3] = "Ela sempre odiou o pai abertamente";
-        tirano_domestico.correctReponse = 1;
+        tirano_domestico.correctReponse = -1;
         tirano_domestico.resolvida = false;
         tirano_domestico.descoberta = false;
         tirano_domestico.realClue = true;
@@ -2447,6 +2846,78 @@ void createClues(TabelaHash &table){
         table.input("karma_violet", karma_violet);
     }
 
+    // --- 31: tensao_arthur ---
+    {
+        Clue tensao_arthur;
+        tensao_arthur.idClue = 31;
+        tensao_arthur.title = "Tensao e Hostilidade Fisica";
+        tensao_arthur.description = "Arthur mantem uma postura atletica e imponente. Uma veia pulsa visivelmente em sua tempora direita e seus punhos se fecham instantaneamente toda vez que o nome de seu pai e mencionado.";
+        tensao_arthur.question = "O que a linguagem corporal de Arthur sugere?";
+        tensao_arthur.options[0] = "Ele esta apenas cansado do trabalho";
+        tensao_arthur.options[1] = "Uma profunda raiva reprimida contra a figura do pai";
+        tensao_arthur.options[2] = "Problemas cardiacos";
+        tensao_arthur.options[3] = "Nenhuma relevancia investigativa";
+        tensao_arthur.correctReponse = 1;
+        tensao_arthur.resolvida = false;
+        tensao_arthur.descoberta = false;
+        tensao_arthur.realClue = false;
+        table.input("tensao_arthur", tensao_arthur);
+    }
+    
+    // --- 32: alibi_arthur ---
+    {
+        Clue alibi_arthur;
+        alibi_arthur.idClue = 32;
+        alibi_arthur.title = "Alibi de Arthur";
+        alibi_arthur.description = "Arthur afirma de forma arrogante que estava trancado no escritorio do andar superior durante o crime, revisando planilhas financeiras ate a chegada da policia.";
+        alibi_arthur.question = "O alibi de Arthur e forte?";
+        alibi_arthur.options[0] = "Sim, existem testemunhas de que ele estava la";
+        alibi_arthur.options[1] = "Nao, e um alibi solitario e impossivel de ser confirmado";
+        alibi_arthur.options[2] = "Sim, pois ele tem muito trabalho a fazer";
+        alibi_arthur.options[3] = "Nao, pois os empregados o viram no corredor";
+        alibi_arthur.correctReponse = 1;
+        alibi_arthur.resolvida = false;
+        alibi_arthur.descoberta = false;
+        alibi_arthur.realClue = false;
+        table.input("alibi_arthur", alibi_arthur);
+    }
+    
+    // --- 33: fisico_alfred ---
+    {
+        Clue fisico_alfred;
+        fisico_alfred.idClue = 33;
+        fisico_alfred.title = "Marcas de Servico e Tabaco";
+        fisico_alfred.description = "O velho mordomo possui um leve tremor nas maos pela idade. Um cheiro forte e persistente de fumo de cachimbo barato e rustico impregna o tecido puido de seu uniforme.";
+        fisico_alfred.question = "O que a inspecao de Alfred revela?";
+        fisico_alfred.options[0] = "Que ele e rico e fuma charutos as escondidas";
+        fisico_alfred.options[1] = "Que ele fuma secretamente os cigarros turcos importados";
+        fisico_alfred.options[2] = "Um estilo de vida humilde, com cheiro incompativel com o cigarro da cena do crime";
+        fisico_alfred.options[3] = "Nenhuma utilidade para a investigacao";
+        fisico_alfred.correctReponse = 2;
+        fisico_alfred.resolvida = false;
+        fisico_alfred.descoberta = false;
+        fisico_alfred.realClue = false;
+        table.input("fisico_alfred", fisico_alfred);
+    }
+
+    // --- 34: alibi_alfred ---
+    {
+        Clue alibi_alfred;
+        alibi_alfred.idClue = 34;
+        alibi_alfred.title = "Alibi de Alfred";
+        alibi_alfred.description = "O mordomo garante que estava recolhido solitario nos aposentos dos fundos da criadagem, polindo a prataria para o jantar do dia seguinte.";
+        alibi_alfred.question = "O que o alibi de Alfred demonstra em relacao a cena do crime?";
+        alibi_alfred.options[0] = "Ele tinha visao limpa e direta do assassino";
+        alibi_alfred.options[1] = "Ele estava posicionado nos fundos, onde a porta externa ou os corredores poderiam ser ouvidos";
+        alibi_alfred.options[2] = "Que ele matou Raymond e voltou ao quarto";
+        alibi_alfred.options[3] = "Que sua surdez o impediu de ouvir qualquer coisa";
+        alibi_alfred.correctReponse = 1;
+        alibi_alfred.resolvida = false;
+        alibi_alfred.descoberta = false;
+        alibi_alfred.realClue = false;
+        table.input("alibi_alfred", alibi_alfred);
+    }
+
 }
   
 void createConnectionsClue(Grafo &graph) {
@@ -2463,7 +2934,7 @@ void createConnectionsClue(Grafo &graph) {
   graph.addNo("cheiro_lavanda", 2);
   graph.addNo("passos_leves", 2);
   graph.addNo("portao_ferro", 2);
-  graph.addNo("vinho_unhas", 2);
+  graph.addNo("unhas_violet", 2);
   
   // Nivel 3: Pistas falsas e conexoes
   graph.addNo("lenco_ensanguentado", 3);
@@ -2491,25 +2962,38 @@ void createConnectionsClue(Grafo &graph) {
   graph.addNo("tirano_domestico", 5);
   graph.addNo("karma_violet", 5);
   
-  // Conexoes logicas
-  graph.addConnections(0, 4);   // faca_crime -> angulo_facada
-  graph.addConnections(0, 5);   // faca_crime -> microfissuras_cabo
-  graph.addConnections(3, 6);   // sangue_pia -> cheiro_lavanda
-  graph.addConnections(1, 4);   // cadeira_caida -> angulo_facada
-  graph.addConnections(2, 9);   // taca_vinho -> vinho_unhas
-  graph.addConnections(6, 9);   // cheiro_lavanda -> vinho_unhas
-  graph.addConnections(7, 23);  // passos_leves -> alibi_violet
-  graph.addConnections(5, 20);  // microfissuras_cabo -> adrenalina_violet
-  graph.addConnections(20, 22); // adrenalina_violet -> perdeu_medo
-  graph.addConnections(19, 22); // frieza_violet -> perdeu_medo
-  graph.addConnections(22, 24); // perdeu_medo -> tirano_domestico
-  graph.addConnections(24, 25); // tirano_domestico -> karma_violet
-  graph.addConnections(8, 10);  // portao_ferro -> lenco_ensanguentado
-  graph.addConnections(11, 12); // cinzeiro_jardim -> cigarros_turcos
-  graph.addConnections(23, 7);  // alibi_violet -> passos_leves
-  graph.addConnections(9, 6);   // vinho_unhas -> cheiro_lavanda
-  graph.addConnections(9, 7);   // vinho_unhas -> passos_leves
+  // Nivel 4 (Extras Arthur e Alfred)
+  graph.addNo("tensao_arthur", 4); // index 30
+  graph.addNo("alibi_arthur", 4); // index 31
+  graph.addNo("fisico_alfred", 4); // index 32
+  graph.addNo("alibi_alfred", 4); // index 33
+
+  // Conexoes logicas corrigidas
+  graph.addConnections(0, 4);   // faca_crime(0) -> angulo_facada(4)
+  graph.addConnections(0, 5);   // faca_crime(0) -> microfissuras_cabo(5)
+  graph.addConnections(3, 6);   // sangue_pia(3) -> cheiro_lavanda(6)
+  graph.addConnections(2, 9);   // taca_vinho(2) -> unhas_violet(9)
+  graph.addConnections(6, 9);   // cheiro_lavanda(6) -> unhas_violet(9)
+  graph.addConnections(7, 26);  // passos_leves(7) -> alibi_violet(26)
+  graph.addConnections(5, 23);  // microfissuras_cabo(5) -> adrenalina_violet(23)
+  graph.addConnections(23, 27); // adrenalina_violet(23) -> perdeu_medo(27)
+  graph.addConnections(22, 27); // frieza_violet(22) -> perdeu_medo(27)
+  graph.addConnections(27, 28); // perdeu_medo(27) -> tirano_domestico(28)
+  graph.addConnections(28, 29); // tirano_domestico(28) -> karma_violet(29)
+  graph.addConnections(8, 10);  // portao_ferro(8) -> lenco_ensanguentado(10)
+  graph.addConnections(16, 11); // cinzeiro_jardim(16) -> cigarros_turcos(11)
+  graph.addConnections(26, 7);  // alibi_violet(26) -> passos_leves(7)
+  graph.addConnections(9, 6);   // unhas_violet(9) -> cheiro_lavanda(6)
+  graph.addConnections(9, 7);   // unhas_violet(9) -> passos_leves(7)
+  
+  // Conexoes Arthur e Alfred
+  graph.addConnections(30, 12); // tensao_arthur(30) -> discussao_arthur(12)
+  graph.addConnections(31, 18); // alibi_arthur(31) -> testamento_sucessao(18)
+  graph.addConnections(32, 20); // fisico_alfred(32) -> cachimbo_alfred(20)
+  graph.addConnections(33, 7);  // alibi_alfred(33) -> passos_leves(7)
 };
+
+
 
 //---------------[Main]---------------
 int main() {
@@ -2517,7 +3001,7 @@ int main() {
 
   Grafo gInvestigation;
 
-  Clue inventory[20];
+  Clue inventory[40];
   int totalClues = 0;
 
   int realCluesSolved = 0;
