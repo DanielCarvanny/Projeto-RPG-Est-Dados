@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Dedução - RPG</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            max-width: 100%;
+        }
+        p.instrucoes {
+            margin-bottom: 20px;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Árvore de Dedução: O Caminho para a Verdade</h1>
+    <p class="instrucoes">Para salvar este diagrama como imagem, você pode clicar com o botão direito sobre ele e selecionar <b>"Salvar imagem como..."</b> ou usar a ferramenta de captura de tela do seu computador.</p>
+
+    <div class="container">
+        <pre class="mermaid">
+graph TD
+    Start([Início da Investigação]) --> Faca{Ângulo da Facada?}
+    Start --> Cigarro{Cigarro Turco?}
+    Start --> Lenco{Lenço Ensanguentado?}
+    
+    %% Trilha Edward / Red Herring
+    Cigarro -->|Pertence a Edward| MentiraEdward[Dedos Amarelados]
+    MentiraEdward --> AlibiEdward{Onde ele estava?}
+    AlibiEdward -->|Forçando o portão do jardim| Ferrugem[Ferrugem no Lenço]
+    AlibiEdward -->|Ouviu passos leves| MulherCorredor(Assassino é Mulher)
+    Ferrugem -.-> Lenco
+    
+    %% Trilha Arthur / Red Herring
+    Start --> Briga{Discussão com Arthur?}
+    Briga -->|Motivo Financeiro| ArthurForte{Arthur é o Assassino?}
+    ArthurForte -->|Refutado por| Cadeira[Cadeira Caída]
+    Cadeira -->|Luta Simulada| AssassinoFraco(Assassino mais fraco que a vítima)
+    Faca -->|Descendente| AssassinoBaixo(Assassino Baixo / Ataque Covarde)
+    AssassinoBaixo -.-> ArthurForte
+    AssassinoFraco -.-> ArthurForte
+    
+    %% Trilha Eleanor / Red Herring
+    Lenco -->|Monograma E.W.| EleanorSuspeita{Eleanor é a Assassina?}
+    EleanorSuspeita --> Frasco{Frasco Antidepressivo}
+    Frasco -->|Roubado de Edward| SintomasEleanor[Sintomas de Abuso]
+    SintomasEleanor -->|Motivo do roubo| InocentaEleanor(Álibi de Eleanor Comprovado)
+    
+    %% Trilha Violet / A Verdade
+    MulherCorredor --> VioletSuspeita{Violet Whitmore}
+    AssassinoBaixo --> VioletSuspeita
+    VioletSuspeita --> Taca{Taça Quebrada}
+    Taca -->|Única Taça no Chão| MentiraViolet[Violet mentiu sobre beber com o pai]
+    VioletSuspeita --> Sangue{Sangue na Pia?}
+    Sangue --> Odor[Cheiro de Lavanda]
+    Odor -->|Conecta as mãos da Violet à pia| ConexaoFisica1(Evidência Física)
+    VioletSuspeita --> Unhas{Vinho nas Unhas?}
+    Unhas -->|Crostas arroxeadas e sangue| ConexaoFisica2(Evidência Física)
+    
+    ConexaoFisica1 --> Psicologico{Comportamento?}
+    ConexaoFisica2 --> Psicologico
+    Psicologico --> Frieza[Ausência de Luto / Adrenalina]
+    Frieza --> Confissao["Alguém perdeu o medo dele"]
+    
+    %% Acusação Final
+    Confissao --> Acusacao{Acusação Final}
+    Acusacao -->|> 3 Pistas Físicas e Psicológicas resolvidas| Veredito(((BEST ENDING: Acusar Violet)))
+    
+    %% Cores e Estilos para facilitar a leitura
+    classDef falso fill:#f9d0c4,stroke:#e06666,stroke-width:2px;
+    classDef verdadeiro fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef fim fill:#ffe599,stroke:#f1c232,stroke-width:3px,font-weight:bold;
+    
+    class ArthurForte,EleanorSuspeita,MentiraEdward falso;
+    class MulherCorredor,AssassinoBaixo,MentiraViolet,Odor,Unhas,Confissao verdadeiro;
+    class Veredito fim;
+        </pre>
+    </div>
+
+</body>
+</html>

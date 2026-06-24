@@ -761,7 +761,7 @@ void arthurInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
         if(angulo_facada.descoberta && cadeira_caida.descoberta){
           cout<<" 5. O assassino teve que usar uma cadeira para forjar uma briga. Mas voce tem quase 1,90m..." << endl;
         }
-        if(testamento_sucessao.descoberta){
+        if(continuacao == 1){
           cout<<" 6. Seu pai pretendia mudar o testamento?" << endl;
         }
         cout<<" 0. Se retirar"<<endl;
@@ -888,6 +888,7 @@ void arthurInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
             cout << "Ela desvia o olhar." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
+            investigateClue(table, graph, "testamento_sucessao", inventory, totalClues, realCluesSolved);
           break;
           
           case 0:
