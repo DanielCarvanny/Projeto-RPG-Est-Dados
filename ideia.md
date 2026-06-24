@@ -2,3 +2,5 @@ Criar no sistema de inventário a opção conclusões onde sherlock anotará tod
 
 
 Analisar como funcionaria o sistema de conclusões e análises, elas serão salvas em algum struct?
+
+Poderiamos adicionar as conclusões das perguntas as descrições

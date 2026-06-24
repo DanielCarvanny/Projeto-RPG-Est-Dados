@@ -156,14 +156,7 @@ class TabelaHash{
 };
 
 class Grafo{
-  public:
-      Grafo(){
-          numVertices = 0;                          
-          for(int i = 0; i < MAX_VERTICES; i++){
-              vertices[i] = NULL;
-          }
-      }
-  private:           
+  private:     
     struct No{
       string idClue;
       int nivel;
@@ -209,6 +202,12 @@ class Grafo{
       }
     };
   public:
+    Grafo(){
+      numVertices = 0;                          
+      for(int i = 0; i < MAX_VERTICES; i++){
+        vertices[i] = NULL;
+      }
+    }
     No* addNo(string idClue, int nivel){ //Criacao do no(Niveis)
 
       No* newNo = new No;
@@ -241,13 +240,13 @@ class Grafo{
     }
     
     void showConnections(int v){ //Exibindo conecoes 
-        No* present = vertices[v];
-        
-        cout << "Ligacoes entre as pistas:"<< present->idClue << endl;
-        
-        for(int i = 0; i < present-> numConnections; i++){
-            cout<< present->connection[i]->idClue << endl;
-        }
+      No* present = vertices[v];
+      
+      cout << "Ligacoes entre as pistas:"<< present->idClue << endl;
+      
+      for(int i = 0; i < present-> numConnections; i++){
+        cout<< present->connection[i]->idClue << endl;
+      }
     }
     
     //AVALIAR:
@@ -270,6 +269,20 @@ class Grafo{
       cout << "\n[Sherlock nao possui conexoes sobre essa pista ainda.]" << endl;
     }
 
+    void showMentalWeb(TabelaHash &table){
+      cout << "\n=== PALACIO MENTAL: REDE DE CONEXOES ===\n" << endl;
+      for(int i = 0 ; i < numVertices ; i++){
+        if(table.search(vertices[i]->idClue).descoberta){
+          cout<<"\n["<<vertices[i]->idClue<<"]\n";
+          for(int j = 0 ; j < vertices[i]->numConnections ; j++){
+            cout << "  ---> Conecta-se com: " << vertices[i]->connection[j]->idClue << endl;
+          }
+        }
+        cout<< "Presione Enter para continuar..." << endl;
+        pausa();
+      }
+      cout << "\n===========================================" << endl;
+    }
 };
 
 void showDeduction(Grafo &graph, TabelaHash& table, string clueKey);
@@ -297,6 +310,7 @@ void showInventory(Clue inventory[],int totalClues){
     cout << inventory[i].description << endl;
   }
   cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
   
   cout << endl;
 }
@@ -315,14 +329,19 @@ bool checkAnswer(Clue &pista){ //Verifica Pista
   }
 
   cin >> response;
+  while(response < 1 || response > 4) {
+    cout << "Opcao invalida. Tente novamente: ";
+    cin >> response;
+  }
   cin.ignore();
 
+  cout << "\nHolmes observa a cena em silencio.\n";
+  cout << "\"Interessante... muito interessante.\"\n";
+
+  pista.resolvida = true;
+  pista.description += "\n\n[Sua Deducao]: " + pista.options[response - 1];
+
   if(response == pista.correctReponse){
-    cout << "\nHolmes observa a cena em silencio.\n";
-    cout << "\"Interessante... muito interessante.\"\n";
-
-    pista.resolvida = true;
-
     return true;
   }
 
@@ -352,21 +371,25 @@ void investigateClue(TabelaHash &table, Grafo &graph, string key, Clue inventory
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
-  addInventory(inventory, totalClues, clue);
-
   if(clue.correctReponse != -1){
     bool correct = checkAnswer(clue);
+    
+    // Filtro invisível do jogo (apenas conta os pontos se for certa e real)
     if(correct && clue.realClue){
       realCluesSolved++;
-      showDeduction(graph, table, key); 
     }
 
+    // Retorno VISUAL garantido para o jogador, mantendo o mistério e a ilusão
+    showDeduction(graph, table, key); 
     cout << "\n[Holmes liga essa pista ao assassinato]\n";
-    cout << "\nPara prosseguir aperte Enter..." << endl;
 
-    //cout << "\nProgresso da investigacao: " << realCluesSolved << "/3 pistas principais.\n";
-    table.input(key, clue);
+    cout << "\nPara prosseguir aperte Enter..." << endl;
+    pausa();
+    limparTela();
   }
+
+  table.input(key, clue);
+  addInventory(inventory, totalClues, clue);
 }
 
 //---------------[Historia]---------------
@@ -511,7 +534,7 @@ void crimeScene(){
 
 // ===============[Interrogatorio Eleanor]==============
 void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
-  int op = -1, op2 = -1;
+  int op = -1, op2 = -1, continuacao = 0;
   do{
     cout << endl << "=== ESPOSA -- ELEANOR WHITMORE ===" << endl;
     cout << "Altura: 1,65m | Porte: Esguio | Olhos: Castanhos | Cabelo: Castanho com grisalho\n" << endl;
@@ -521,6 +544,7 @@ void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int
     cout<<"Opcao: ";
     cin>>op2;
     cin.ignore();
+    limparTela();
     
     if(op2 == 1){
       cout << "=== Caracteristicas ===" << endl;
@@ -550,7 +574,7 @@ void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int
         cout << "=== Perguntas ===" << endl;
         cout<<" 1. Como era sua relacao com seu marido?" << endl; 
         cout <<" 2. Onde estava durante o assassinato?" << endl;
-        if(suspeita_traicao.descoberta){
+        if(continuacao > 0){
           cout <<" 3. A senhora suspeitava de traicao?" << endl;
         }
         if(lenco_ensanguentado.descoberta){
@@ -585,8 +609,8 @@ void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int
             cout << "Ela evita olhar diretamente para Holmes, projetando uma postura defensiva que esconde um ressentimento profundo." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
-
-            investigateClue(table, graph, "suspeita_traicao", inventory, totalClues, realCluesSolved);
+            limparTela();
+            continuacao = 1;
           break;
         
           case 2:
@@ -629,6 +653,7 @@ void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int
             cout << "Ela projeta um olhar arrependido." << endl;
             cout << "\nPara prosseguir aperte Enter..." << endl;
             pausa();
+            investigateClue(table, graph, "suspeita_traicao", inventory, totalClues, realCluesSolved);
           break;
 
           case 4:
@@ -697,6 +722,9 @@ void eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int
           case 0:
             cout<<"=== Sherlock Holmes ==="<<endl;
             cout<<"-- Tudo bem."<<endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
           break;
 
           default:
@@ -726,6 +754,7 @@ void arthurInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
     cout<<"Opcao: ";
     cin>>op2;
     cin.ignore();
+    limparTela();
 
     if(op2 == 1){
       cout << "=== Caracteristicas ===" << endl;
@@ -901,6 +930,9 @@ void arthurInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
           case 0:
             cout<<"=== Sherlock Holmes ==="<<endl;
             cout<<"-- Tudo bem."<<endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
           break;
 
           default:
@@ -928,6 +960,7 @@ void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
     cout<<"Opcao: ";
     cin>>op2;
     cin.ignore();
+    limparTela();
 
     if(op2 == 1){
       cout << "=== Caracteristicas ===" << endl;
@@ -942,11 +975,10 @@ void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
       cout << "Vestimenta: Paleto de tweed marrom ligeiramente largo nos ombros. Camisa branca" << endl;
       cout << "  com o botao do colarinho aberto. Leve aroma adocicado de tabaco de baunilha" << endl;
       cout << "  impregna o tecido.\n" << endl;
-      
-      investigateClue(table, graph, "dedos_amarelados", inventory, totalClues, realCluesSolved);
-
       cout << "\nPara prosseguir aperte Enter..." << endl;
       pausa();
+
+      investigateClue(table, graph, "dedos_amarelados", inventory, totalClues, realCluesSolved);
     }
     else if(op2!=0 && op2!=1 && op2!=2){
       cout<<"Opcao invalida"<<endl;
@@ -1101,6 +1133,9 @@ void edwardInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
           case 0:
             cout<<"=== Sherlock Holmes ==="<<endl;
             cout<<"-- Tudo bem."<<endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
             break;
           
           default:
@@ -1127,6 +1162,7 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
     cout<<"Opcao: ";
     cin>>op2;
     cin.ignore();
+    limparTela();
 
     if(op2 == 1){
       cout << "=== Caracteristicas ===" << endl;
@@ -1143,12 +1179,12 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
       cout << "  gola. O tecido e caro, mas a cor clarissima torna ainda mais suspeita a" << endl;
       cout << "  mancha na barra.\n" << endl;
       
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
+
       investigateClue(table, graph, "frieza_violet", inventory, totalClues, realCluesSolved);
       investigateClue(table, graph, "adrenalina_violet", inventory, totalClues, realCluesSolved);
       investigateClue(table, graph, "vinho_unhas", inventory, totalClues, realCluesSolved);
-
-      cout << "\nPara prosseguir aperte Enter..." << endl;
-      pausa();
     }
     else if(op2!=0 && op2!=1 && op2!=2){
       cout<<"Opcao invalida"<<endl;
@@ -1341,6 +1377,9 @@ void violetInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
           case 0:
             cout<<"=== Sherlock Holmes ==="<<endl;
             cout<<"-- Tudo bem."<<endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
           break;
           
           default:
@@ -1368,6 +1407,7 @@ void alfredInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
     cout<<"Opcao: ";
     cin>>op2;
     cin.ignore();
+    limparTela();
     
     if(op2 == 1){
       cout<<"=== Caracteristicas ==="<<endl;
@@ -1383,10 +1423,16 @@ void alfredInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
       cout << "  o tecido dos cotovelos ja comeca a ficar lustroso de tanto uso. Luvas brancas" << endl;
       cout << "  que ele remove apenas para fumar seu cachimbo no jardim. Sapatos pretos" << endl;
       cout << "  engraxados, mas com o solado gasto." << endl;
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
+      limparTela();
     }
     else if(op2!=0 && op2!=1 && op2!=2){
       cout<<"Opcao invalida"<<endl;
       cout<<"Tente novamente"<<endl;
+      cout << "\nPara prosseguir aperte Enter..." << endl;
+      pausa();
+      limparTela();
     }
     
     else if(op2 == 2){
@@ -1492,12 +1538,18 @@ void alfredInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
           case 0:
             cout<<"=== Sherlock Holmes ==="<<endl;
             cout<<"-- Tudo bem."<<endl;
-            break;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+          break;
           
           default:
             cout<<"Opcao invalida"<<endl;
-            cout<<"Tente novamente"<<endl; //Nao precisa de ajuste
-            break;
+            cout<<"Tente novamente"<<endl;
+            cout << "\nPara prosseguir aperte Enter..." << endl;
+            pausa();
+            limparTela();
+          break;
         }
       } while (op!=0);
     }
@@ -1505,45 +1557,54 @@ void alfredInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int 
 }
 
 void interrogationScene(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved){
-  cout << endl << "=== INTERROGATORIO ===" << endl;
-  cout << "\nPara prosseguir aperte Enter..." << endl;
-  pausa();
   
   int op = -1;
   while(op != 0){
-    //limparTela();
+    cout << endl << "=== INTERROGATORIO ===\n" << endl;
     cout<<"Suspeitos: "<<endl;
     cout<<" 1. Eleanor - Esposa"<<endl;
     cout<<" 2. Arthur - Filho mais velho"<<endl;
     cout<<" 3. Edward - Filho do meio"<<endl;
     cout<<" 4. Violet - Filha"<<endl;
     cout<<" 5. Alfred - Mordomo"<<endl;
+    cout<<" 0. Se retirar"<<endl;
     cout<<"Opcao: ";
     cin>> op;
 
     switch(op){
       case 1:
         eleanorInterrogation(table, graph, inventory, totalClues, realCluesSolved);
-        break;
+        limparTela();
+      break;
       case 2:
         arthurInterrogation(table, graph, inventory, totalClues, realCluesSolved);
+        limparTela();
         break;
       case 3:
         edwardInterrogation(table, graph, inventory, totalClues, realCluesSolved);
+        limparTela();
         break;
       case 4:
         violetInterrogation(table, graph, inventory, totalClues, realCluesSolved);
+        limparTela();
         break;
       case 5:
         alfredInterrogation(table, graph, inventory, totalClues, realCluesSolved);
+        limparTela();
         break;
       case 0:
         cout<<"Saindo"<<endl;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        limparTela();
         break;
       default:
         cout<<"Opcao invalida"<<endl;
         cout<<"Tente novamente"<<endl;
-        break;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        limparTela();
+      break;
     }
   }
 }
@@ -1629,7 +1690,7 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
     cout << " 6. Bituca de Cigarro" << endl;
     cout << " 7. Frasco de Remedio no lixo" << endl;
     cout << " 8. Conversar com alguns empregados" << endl;
-    cout << "9. Analisar fisico da vitima" << endl;
+    cout << " 9. Analisar fisico da vitima" << endl;
     cout << " 10. Ver Inventario" << endl;
     cout << " 0. Se retirar" << endl;
     cout << "Opcao: ";
@@ -1650,19 +1711,27 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
         switch(sub_op) {
             case 1:
                 investigateClue(table, graph, "faca_crime", inventory, totalClues, realCluesSolved); 
-                break;
+              break;
             case 2:
                 investigateClue(table, graph, "angulo_facada", inventory, totalClues, realCluesSolved);
-                break;
+              break;
             case 3:
                 investigateClue(table, graph, "microfissuras_cabo", inventory, totalClues, realCluesSolved);
-                break;
+              break;
             case 0:
-                break; // Volta ao menu da cozinha
+              cout << "Voltando ao menu da cozinha..." << endl;
+              cout << "\nPara prosseguir aperte Enter..." << endl;
+              pausa();
+              limparTela();
+            break;
+            
             default:
               cout << "Opcao invalida." << endl;
+              cout << "\nPara prosseguir aperte Enter..." << endl;
+              pausa();
+              limparTela();
+            break;
         }
-        break;
       }
       case 2:
         investigateClue(table, graph, "cadeira_caida", inventory, totalClues, realCluesSolved);
@@ -1687,9 +1756,16 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
                 investigateClue(table, graph, "cheiro_lavanda", inventory, totalClues, realCluesSolved);
                 break;
             case 0:
-                break; // Volta ao menu
+              cout << "Voltando ao menu da cozinha..." << endl;
+              cout << "\nPara prosseguir aperte Enter..." << endl;
+              pausa();
+              limparTela();
+            break;
             default:
                 cout << "Opcao invalida." << endl;
+                cout << "\nPara prosseguir aperte Enter..." << endl;
+                pausa();
+                limparTela();
         }
         break;
       }
@@ -1724,15 +1800,23 @@ void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClu
         cout << "\nPara prosseguir aperte Enter..." << endl;
         pausa();
         
-        break;
+      break;
       case 10:
         showInventory(inventory, totalClues);
-        break;
+      break;
+
       case 0:
         cout << "Saindo da cozinha..." << endl;
-        break;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        limparTela();
+      break;
       default:
         if (op != 0) cout << "Opcao invalida." << endl;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        limparTela();
+      break;
     }
   } while(op != 0);
 }
@@ -1749,6 +1833,7 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
     cout << "1. Investigar Cena do Crime" << endl;
     cout << "2. Interrogar Suspeitos" << endl;
     cout << "3. Fazer uma acusacao" << endl;
+    cout<< "4. Ver Palacio mental" << endl;
     cout << "0. Desistir" << endl;
     cout << "Opcao: ";
     cin >> op;
@@ -1756,10 +1841,10 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
     switch(op){
       case 1:
         kitchenMenu(table, graph , inventory, totalClues, realCluesSolved);
-        break;
+      break;
       case 2:
         interrogationScene(table, graph, inventory, totalClues, realCluesSolved);
-        break;
+      break;
       case 3:
         if(realCluesSolved >= 3){
           accusationMenu();
@@ -1768,13 +1853,19 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
           cout << "\nHolmes ainda nao possui evidencias suficientes.\n"; //"evidencias" nao precisa de ajuste aqui, mas vou ajustar para consistencia
           pausa();
         }
-        break;
+      break;
+      case 4:
+        graph.showMentalWeb(table);
+      break;
       case 0:
         cout << "Voce foi incapaz de resolver o caso." << endl;
-        break;
+      break;
       default:
         cout << "Opcao invalida." << endl;
-        break;
+        cout << "\nPara prosseguir aperte Enter..." << endl;
+        pausa();
+        limparTela();
+      break;
     }
   }while(op != 0);
   
@@ -1791,11 +1882,7 @@ void createClues(TabelaHash &table){
         Clue faca_crime;
         faca_crime.idClue = 1;
         faca_crime.title = "Faca do Crime";
-        faca_crime.description = "Uma faca de cozinha cravada no peito da vitima. "
-                                 "A lamina esta parcialmente limpa: ha sangue visivel, "
-                                 "mas quase nenhuma impressao digital no corpo metalico. "
-                                 "Pequenas ranhuras proximas ao cabo ainda contem residuos de sangue, "
-                                 "indicando que o assassino tentou limpar a arma, mas esqueceu os detalhes.";
+        faca_crime.description = "Uma faca de cozinha cravada no peito da vitima. A lamina possui partes brilhantes e partes ensanguentadas, mas o metal nao contem impressoes digitais visiveis a olho nu. No entanto, as pequenas ranhuras e reentrancias proximas ao cabo estao escuras com residuos coagulados.";
         faca_crime.question = "O que a limpeza parcial da faca sugere sobre o assassino?";
         faca_crime.options[0] = "Foi um crime premeditado com tecnicos profissionais";
         faca_crime.options[1] = "O assassino estava com pressa ou nao tinha experiencia em limpar cenas de crime";
@@ -1813,10 +1900,7 @@ void createClues(TabelaHash &table){
         Clue angulo_facada;
         angulo_facada.idClue = 2;
         angulo_facada.title = "Angulo da Facada";
-        angulo_facada.description = "A lamina entrou em um angulo descendente incomum. "
-                                    "Isso significa que o assassino era significativamente mais baixo "
-                                    "que o patriarca OU que ele golpeou a vitima por tras enquanto "
-                                    "ela estava sentada.";
+        angulo_facada.description = "Holmes inspeciona a ferida. A lamina entrou no corpo da vitima em um angulo descendente agudo (de cima para baixo). Ao olhar para o relatorio de Raymond (1,82m e porte imponente), a fisica desse golpe parece nao se encaixar em um ataque direto padrao.";
         angulo_facada.question = "O que o angulo descendente da facada indica?";
         angulo_facada.options[0] = "O assassino era canhoto";
         angulo_facada.options[1] = "A vitima foi atacada deitada no chao";
@@ -1834,10 +1918,7 @@ void createClues(TabelaHash &table){
         Clue microfissuras_cabo;
         microfissuras_cabo.idClue = 3;
         microfissuras_cabo.title = "Microfissuras no Cabo";
-        microfissuras_cabo.description = "Existem microfissuras na estrutura de polimero do cabo da faca. "
-                                          "Isso indica que quem a segurou aplicou uma forca excessiva "
-                                          "induzida por tensao extrema, adrenalina e forte obsessao emocional. "
-                                          "Nao e um golpe frio e calculado - e um crime passional.";
+        microfissuras_cabo.description = "Examinando com a lupa, existem varias microfissuras recentes na estrutura de polimero do cabo da faca. Elas nao decorrem de desgaste natural, mas de uma compressao violenta. Quem empunhou esta faca apertou os dedos com uma forca absurda, muito alem da necessidade fisica de desferir um unico golpe.";
         microfissuras_cabo.question = "O que as microfissuras no cabo da faca revelam sobre o estado emocional do assassino?";
         microfissuras_cabo.options[0] = "O assassino estava calmo e calculista";
         microfissuras_cabo.options[1] = "A faca era de baixa qualidade e quebrou sozinha";
@@ -1859,10 +1940,7 @@ void createClues(TabelaHash &table){
         Clue cadeira_caida;
         cadeira_caida.idClue = 4;
         cadeira_caida.title = "Cadeira Caida";
-        cadeira_caida.description = "Uma cadeira caida distante do centro da cozinha. "
-                                     "No chao, ha marcas de arrasto rapido. A disposicao faz parecer "
-                                     "que foi colocada ou derrubada propositalmente para simular "
-                                     "uma briga corporal que nao aconteceu.";
+        cadeira_caida.description = "Ha uma unica cadeira caida de lado, distante do centro da cozinha. No assoalho de madeira sob ela, ve-se uma marca longa de arrasto rapido. Contudo, as panelas no fogao e os talheres nos balcoes em volta estao perfeitamente alinhados, sem nenhum sinal de disturbio.";
         cadeira_caida.question = "Por que a posicao da cadeira caida e suspeita?";
         cadeira_caida.options[0] = "Ela prova que houve uma luta corpo a corpo intensa";
         cadeira_caida.options[1] = "A cadeira foi arrastada para o centro durante o ataque";
@@ -1880,10 +1958,7 @@ void createClues(TabelaHash &table){
         Clue taca_vinho;
         taca_vinho.idClue = 5;
         taca_vinho.title = "Taca de Vinho Quebrada";
-        taca_vinho.description = "Uma unica taca de vinho quebrada no chao. "
-                                  "O liquido derramado indica que o homem estava sozinho "
-                                  "apreciando a bebida antes do ataque. "
-                                  "Nao ha segunda taca - ele nao estava acompanhado.";
+        taca_vinho.description = "Uma elegante taca de cristal estilhacada no chao, rodeada por uma poca de vinho tinto seco. A garrafa de origem nao esta a vista. Holmes examina a pia, os escorredores e os balcoes laterais: nao existe absolutamente nenhum vestigio de uma segunda taca na cozinha.";
         taca_vinho.question = "O que a presenca de uma unica taca de vinho indica?";
         taca_vinho.options[0] = "O assassino bebeu com a vitima antes do crime";
         taca_vinho.options[1] = "A vitima estava sozinha bebendo vinho antes do ataque";
@@ -1901,10 +1976,7 @@ void createClues(TabelaHash &table){
         Clue sangue_pia;
         sangue_pia.idClue = 6;
         sangue_pia.title = "Sangue na Pia";
-        sangue_pia.description = "Pequenos pingos de sangue perto da pia. "
-                                  "O padrao de diluicao mostra que alguem lavou rapidamente "
-                                  "as maos ali logo apos o ataque. Um cheiro do detergente "
-                                  "permanece no local - um cheiro agradavel de lavanda.";
+        sangue_pia.description = "Pequenas gotas circulares de sangue secaram na borda de ceramica da pia. O fundo da cuba de metal esta umido, e no ralo nota-se uma leve coloracao rosada de sangue muito diluido em agua. Acima, o frasco de sabonete liquido exala um forte aroma no ar.";
         sangue_pia.question = "O que o sangue diluido na pia revela sobre o assassino?";
         sangue_pia.options[0] = "A vitima tentou se limpar antes de morrer";
         sangue_pia.options[1] = "O assassino lavou as maos na pia apos o crime";
@@ -1922,10 +1994,7 @@ void createClues(TabelaHash &table){
         Clue cheiro_lavanda;
         cheiro_lavanda.idClue = 7;
         cheiro_lavanda.title = "Cheiro de Lavanda na Pia";
-        cheiro_lavanda.description = "O detergente usado na pia exala um perfume marcante "
-                                      "de lavanda. E um produto de limpeza caro, importado, "
-                                      "comumente associado a habitos femininos da alta sociedade. "
-                                      "O cheiro ainda esta forte, indicando uso muito recente.";
+        cheiro_lavanda.description = "O sabonete usado na pia exala um perfume doce, floral e intenso de lavanda francesa. E um produto importado e luxuoso, completamente diferente dos saboes industriais e asperos que os empregados da casa costumam usar para higienizar potes e talheres na rotina da cozinha.";
         cheiro_lavanda.question = "O que o cheiro de lavanda na pia pode indicar sobre o assassino?";
         cheiro_lavanda.options[0] = "Era um empregado que limpava a cozinha";
         cheiro_lavanda.options[1] = "Provavelmente e uma mulher ou alguem que usa produtos femininos de luxo";
@@ -1947,11 +2016,7 @@ void createClues(TabelaHash &table){
         Clue lenco_ensanguentado;
         lenco_ensanguentado.idClue = 8;
         lenco_ensanguentado.title = "Lenco Ensanguentado com Ferrugem";
-        lenco_ensanguentado.description = "Um lenco de seda fina com o monograma 'E.W.', "
-                                           "encontrado muito proximo a faca e parcialmente ensanguentado. "
-                                           "Ao inspecionar a fundo, nota-se uma mancha escura de ferrugem "
-                                           "de metal velho. O monograma 'E.W.' corresponde a Eleanor Whitmore. "
-                                           "Porem, a ferrugem sugere que o lenco foi usado em algo alem do crime.";
+        lenco_ensanguentado.description = "Um lenco de seda fina abandonado no chao. O tecido impecavel possui o monograma bordado 'E.W.'. Uma das pontas esta manchada de sangue recente. Na outra extremidade, ha manchas asperas e secas de um po marrom e alaranjado, com um distinto cheiro de metal oxidado.";
         lenco_ensanguentado.question = "A quem pertence o lenco encontrado na cena do crime?";
         lenco_ensanguentado.options[0] = "A Violet Whitmore";
         lenco_ensanguentado.options[1] = "A Eleanor Whitmore (monograma E.W.)";
@@ -1969,11 +2034,7 @@ void createClues(TabelaHash &table){
         Clue cigarros_turcos;
         cigarros_turcos.idClue = 9;
         cigarros_turcos.title = "Cigarros Turcos na Cozinha";
-        cigarros_turcos.description = "Uma bituca de cigarro encontrada perto da porta da cozinha. "
-                                       "E de uma marca cara de tabaco turco com aroma adocicado "
-                                       "de baunilha e filtro dourado. Ninguem na familia admite fumar "
-                                       "este tipo de cigarro. Apenas o mordomo Alfred tem cheiro de fumo, "
-                                       "mas ele fuma cachimbo barato, nao cigarros de luxo.";
+        cigarros_turcos.description = "Uma bituca esmagada encostada no rodape da porta. E feita de tabaco turco importado, com filtro dourado e um cheiro persistente de baunilha. E um artigo carissimo. Holmes guarda a bituca em um frasco de vidro.";
         cigarros_turcos.question = "O que a bituca de cigarro turco na cozinha sugere?";
         cigarros_turcos.options[0] = "O mordomo Alfred e o assassino";
         cigarros_turcos.options[1] = "A vitima estava fumando antes de morrer";
@@ -1991,10 +2052,7 @@ void createClues(TabelaHash &table){
         Clue discussao_arthur;
         discussao_arthur.idClue = 10;
         discussao_arthur.title = "Discussao Recente com o Filho Mais Velho";
-        discussao_arthur.description = "Os empregados relataram uma briga violenta entre Arthur Whitmore "
-                                        "e seu pai na manha do crime. Arthur confrontou Raymond sobre "
-                                        "sua aposentadoria e a exclusao de seu nome da linha de sucessao "
-                                        "das empresas da familia. Arthur queria assumir o controle dos negocios.";
+        discussao_arthur.description = "Os empregados relatam cochichando que presenciaram uma discussao acalorada entre o filho mais velho e a vitima horas antes do crime. O embate foi sobre aposentadoria e testamentos. Raymond supostamente gritou que retiraria o nome de Arthur dos conselhos de administracao.";
         discussao_arthur.question = "O que motivou a discussao entre Arthur e seu pai?";
         discussao_arthur.options[0] = "Arthur descobriu a traicao da esposa do pai";
         discussao_arthur.options[1] = "Arthur foi excluido da linha de sucessao das empresas";
@@ -2012,12 +2070,7 @@ void createClues(TabelaHash &table){
         Clue frasco_antidepressivo;
         frasco_antidepressivo.idClue = 11;
         frasco_antidepressivo.title = "Frasco de Antidepressivo no Lixo";
-        frasco_antidepressivo.description = "Um frasco de vidro ambar de farmacia de manipulacao "
-                                             "encontrado no lixo da cozinha. O rotulo esta rasgado, "
-                                             "mas exibe o nome do paciente: 'Edwa...' e o medicamento "
-                                             "e um forte antidepressivo. O frasco esta vazio. "
-                                             "Edward Whitmore e o filho do meio, conhecido por crises "
-                                             "de ansiedade e instabilidade emocional.";
+        frasco_antidepressivo.description = "No lixo da cozinha jaz um pequeno frasco de vidro ambar de farmacia. O rotulo esta parcialmente rasgado, mas o nome do paciente impresso comeca com 'Edwa...'. A formula quimica rotulada pertence a uma classe de fortes antidepressivos controlados.";
         frasco_antidepressivo.question = "O que o frasco de antidepressivo no lixo da cozinha indica?";
         frasco_antidepressivo.options[0] = "Edward Whitmore estava na cozinha e matou o pai";
         frasco_antidepressivo.options[1] = "A vitima tomava antidepressivos escondido";
@@ -2062,11 +2115,7 @@ void createClues(TabelaHash &table){
         Clue passos_leves;
         passos_leves.idClue = 13;
         passos_leves.title = "Passos Leves no Corredor";
-        passos_leves.description = "Tanto Edward quanto Alfred relataram ter ouvido passos "
-                                    "no corredor proximo a cozinha. Alfred descreveu os passos "
-                                    "como 'rapidos e leves demais para serem de um homem'. "
-                                    "Edward tambem os ouviu e fugiu de volta para o jardim. "
-                                    "Isso indica que uma mulher estava no corredor na hora do crime.";
+        passos_leves.description = "Mais de uma pessoa relatou ter ouvido movimentacao no longo corredor espelhado perto da cozinha no horario aproximado do incidente. Foram descritos ritmos de passadas muito rapidas e os impactos no assoalho eram suaves e leves demais.";
         passos_leves.question = "O que os passos leves no corredor indicam sobre o assassino?";
         passos_leves.options[0] = "Era um homem pesando mais de 90 quilos";
         passos_leves.options[1] = "Duas pessoas estavam no corredor";
@@ -2085,13 +2134,10 @@ void createClues(TabelaHash &table){
         dedos_amarelados.idClue = 14;
         dedos_amarelados.title = "Dedos Amarelados de Fumante";
         dedos_amarelados.description = "Watson observou que os dedos indicador e medio de Edward "
-                                        "estao levemente amarelados - um sinal classico de fumante "
-                                        "compulsivo. Isso contradiz a afirmacao inicial de Edward "
-                                        "de que 'ninguem nesta familia fuma'. Edward mais tarde "
-                                        "admitiu que fuma cigarros turcos escondido da mae.";
+                                        "estao levemente amarelados.";
         dedos_amarelados.question = "O que os dedos amarelados de Edward revelam?";
         dedos_amarelados.options[0] = "Ele trabalha com produtos quimicos";
-        dedos_amarelados.options[1] = "Ele e fumante compulsivo, apesar de negar inicialmente";
+        dedos_amarelados.options[1] = "Um sinal classico de fumante compulsivo.";
         dedos_amarelados.options[2] = "Ele tem uma doenca de figado";
         dedos_amarelados.options[3] = "E uma caracteristica genetica da familia";
         dedos_amarelados.correctReponse = 1;
@@ -2150,12 +2196,7 @@ void createClues(TabelaHash &table){
         Clue sintomas_eleanor;
         sintomas_eleanor.idClue = 17;
         sintomas_eleanor.title = "Sintomas Suspeitos de Eleanor";
-        sintomas_eleanor.description = "Sherlock observou que Eleanor apresenta agitacao extrema nos pes, "
-                                        "espasmos musculares e uma forte sonolencia incapacitante. "
-                                        "Ela afirma tomar sedativos para insonia, mas esses sintomas "
-                                        "sao classicos de abuso de antidepressivos sem prescricao - "
-                                        "exatamente o tipo de medicamento encontrado no frasco "
-                                        "de Edward descartado no lixo da cozinha.";
+        sintomas_eleanor.description = "Ao observar Eleanor, Holmes nota detalhes sutis: ela apresenta uma forte sonolencia, os musculos das pernas possuem pequenos espasmos involuntarios e as pupilas estao dilatadas. Ela afirma estar sob o efeito de seus sedativos padrao para insonia.";
         sintomas_eleanor.question = "O que os sintomas de Eleanor realmente indicam?";
         sintomas_eleanor.options[0] = "Ela esta sob efeito de sedativos como afirma";
         sintomas_eleanor.options[1] = "Ela apresenta sintomas de abuso de antidepressivos, nao de sedativos";
@@ -2173,12 +2214,7 @@ void createClues(TabelaHash &table){
         Clue testamento_sucessao;
         testamento_sucessao.idClue = 18;
         testamento_sucessao.title = "Testamento e Linha de Sucessao";
-        testamento_sucessao.description = "Durante o interrogatorio de Arthur, quando perguntado "
-                                           "sobre uma possivel mudanca no testamento, ele travou "
-                                           "e encarou a mae, Eleanor, com um olhar de indagacao. "
-                                           "Ela nao respondeu. Isso sugere que Eleanor sabe algo "
-                                           "sobre o testamento que Arthur desconhece - ou que "
-                                           "os dois tem um segredo compartilhado sobre a heranca.";
+        testamento_sucessao.description = "Durante uma pergunta incisiva sobre possiveis alteracoes no testamento da familia, Arthur congelou a voz repentinamente e virou o rosto para encarar sua mae, Eleanor, buscando contato visual. Eleanor fechou os olhos e desviou o rosto rapidamente para o lado oposto.";
         testamento_sucessao.question = "O que a reacao de Arthur ao falar do testamento sugere?";
         testamento_sucessao.options[0] = "Ele ja sabia que foi deserdado";
         testamento_sucessao.options[1] = "Ele e Eleanor compartilham um segredo sobre a heranca";
@@ -2196,13 +2232,7 @@ void createClues(TabelaHash &table){
         Clue mordomo_invisivel;
         mordomo_invisivel.idClue = 19;
         mordomo_invisivel.title = "Mordomo Invisivel";
-        mordomo_invisivel.description = "Alfred serviu Raymond Whitmore por quarenta anos. "
-                                         "Quando perguntado sobre sua relacao com o patrao, "
-                                         "respondeu: 'Para o Sr. Raymond, homens da minha classe "
-                                         "sao como mobilia. Invisiveis.' Isso indica um profundo "
-                                         "ressentimento acumulado por decadas de tratamento indigno. "
-                                         "Por ser 'invisivel', Alfred poderia circular pela casa "
-                                         "sem ser notado - a testemunha perfeita... ou o assassino perfeito.";
+        mordomo_invisivel.description = "Alfred serve os Whitmore ha quarenta anos. Com amargura na voz, ele comenta: 'Para o Sr. Raymond, homens da minha classe sao como a mobilia. Somos invisiveis.' Ele tem livre acesso as chaves e circula pelos corredores tao silenciosamente que os moradores ja nem notam sua presenca.";
         mordomo_invisivel.question = "Por que a 'invisibilidade' de Alfred e relevante?";
         mordomo_invisivel.options[0] = "Significa que ele nao pode ser testemunha de nada";
         mordomo_invisivel.options[1] = "Ele poderia circular sem ser notado - testemunha ou suspeito ideal";
@@ -2220,12 +2250,7 @@ void createClues(TabelaHash &table){
         Clue cachimbo_alfred;
         cachimbo_alfred.idClue = 20;
         cachimbo_alfred.title = "Cachimbo Velho do Mordomo";
-        cachimbo_alfred.description = "Alfred possui um forte cheiro de fumo, mas ele explica "
-                                       "que fuma seu cachimbo velho no jardim. Ele afirma nao ter "
-                                       "dinheiro para 'os luxos que os jovens compram na cidade', "
-                                       "referindo-se aos cigarros turcos importados. O cheiro de "
-                                       "cachimbo e diferente do aroma adocicado de baunilha "
-                                       "dos cigarros encontrados na cozinha.";
+        cachimbo_alfred.description = "Apesar do forte cheiro de fumante impregnado nas roupas de Alfred, ele tira de seu bolso interno um cachimbo de madeira velha e desgastada. Ele resmunga que o salario nao lhe permite comprar os luxuosos tabacos importados vendidos na cidade.";
         cachimbo_alfred.question = "O cheiro de fumo em Alfred e compativel com os cigarros da cena do crime?";
         cachimbo_alfred.options[0] = "Sim, e exatamente o mesmo tabaco turco";
         cachimbo_alfred.options[1] = "Nao - Alfred fuma cachimbo barato, nao cigarros turcos de luxo";
@@ -2247,12 +2272,7 @@ void createClues(TabelaHash &table){
         Clue fones_ouvido;
         fones_ouvido.idClue = 21;
         fones_ouvido.title = "Fones de Ouvido de Violet";
-        fones_ouvido.description = "Violet afirma que estava em seu quarto de costura "
-                                    "com fones de ouvido, terminando o bordado de um vestido novo. "
-                                    "Ela diz que nao escutou absolutamente nada ate os gritos "
-                                    "dos policiais. No entanto, Edward relatou ter ouvido passos "
-                                    "leves de mulher no corredor. Se Violet estava com fones "
-                                    "no quarto, quem estava no corredor?";
+        fones_ouvido.description = "Violet sustenta firmemente que passou toda a noite trancada no quarto de costura, focada em bordar enquanto escutava fonografias musicais em alto volume com seus fones. Ela alega que seu isolamento foi tao profundo que os gritos da policia foram a primeira coisa que ouviu.";
         fones_ouvido.question = "Qual a contradicao no alibi de Violet?";
         fones_ouvido.options[0] = "Ela nao sabe costurar";
         fones_ouvido.options[1] = "Ela diz que usava fones no quarto, mas passos de mulher foram ouvidos no corredor";
@@ -2270,12 +2290,7 @@ void createClues(TabelaHash &table){
         Clue frieza_violet;
         frieza_violet.idClue = 22;
         frieza_violet.title = "Frieza Emocional de Violet";
-        frieza_violet.description = "Sherlock observou que Violet responde com rapidez e um sorriso "
-                                     "excessivamente simetrico. Suas palavras pintam um retrato "
-                                     "de 'filha perfeita', mas seus olhos permanecem frios e distantes, "
-                                     "com pouco vestigio real de luto ou calor afetivo. "
-                                     "Quando perguntada se esta triste, ela diz: 'E como nao estar mais triste?' "
-                                     "- mas Sherlock nota que ela DIZ que sente, mas nao demonstra.";
+        frieza_violet.description = "A postura de Violet e de extrema polidez. Ela se refere a tragedia usando as palavras corretas: 'dor', 'tristeza' e 'perda'. No entanto, Holmes observa seu rosto de perto; a simetria de seus sorrisos e a secura absoluta de seus olhos compoem uma reacao quase robotica para uma jovem que acabou de perder o pai.";
         frieza_violet.question = "O que o comportamento de Violet revela?";
         frieza_violet.options[0] = "Ela esta profundamente abalada e chora escondido";
         frieza_violet.options[1] = "Ela tem uma personalidade naturalmente fria, sem relacao com o crime";
@@ -2293,13 +2308,7 @@ void createClues(TabelaHash &table){
         Clue perdeu_medo;
         perdeu_medo.idClue = 23;
         perdeu_medo.title = "'Alguem Finalmente Perdeu o Medo Dele'";
-        perdeu_medo.description = "Quando Sherlock perguntou a Violet o que ela achava "
-                                   "que tinha acontecido, ela respondeu com um sorriso discreto: "
-                                   "'Acho que alguem finalmente perdeu o medo dele.' "
-                                   "Esta frase e extremamente reveladora. Primeiro, reconhece "
-                                   "que o pai era temido. Segundo, sugere alivio, nao choque. "
-                                   "Terceiro, a palavra 'finalmente' indica que era algo esperado. "
-                                   "Para Sherlock, isso soa quase como uma confissao velada.";
+        perdeu_medo.description = "Ao ser pressionada a dar sua visao pessoal do crime, Violet suaviza a expressao facial e, olhando para o teto, profere uma frase metodica: 'Acho que alguem finalmente perdeu o medo dele.'";
         perdeu_medo.question = "Por que a frase 'alguem finalmente perdeu o medo dele' e tao importante?";
         perdeu_medo.options[0] = "E uma frase comum sem significado especial";
         perdeu_medo.options[1] = "Revela que o pai era amado por todos";
@@ -2317,12 +2326,7 @@ void createClues(TabelaHash &table){
         Clue adrenalina_violet;
         adrenalina_violet.idClue = 24;
         adrenalina_violet.title = "Tensao e Adrenalina em Violet";
-        adrenalina_violet.description = "Sherlock observou que as maos de Violet estao tensas, "
-                                         "como se estivesse com uma certa adrenalina no corpo. "
-                                         "Ela diz estar triste e abalada, mas seu corpo conta "
-                                         "uma historia diferente. A tensao muscular e compativel "
-                                         "com alguem que passou por um esforco fisico extremo "
-                                         "recentemente - como esfaquear alguem com forca obsessiva.";
+        adrenalina_violet.description = "Enquanto fala metodicamente, os bracos de Violet estao travados nas laterais do corpo. Ela aperta as proprias maos com tanta forca que os nodulos dos dedos ficam brancos. Sua respiracao e acelerada. E uma tensao muscular caracteristica de uma imensa descarga de adrenalina fisica que ainda nao abandonou o corpo.";
         adrenalina_violet.question = "O que as maos tensas de Violet sugerem?";
         adrenalina_violet.options[0] = "Ela esta apenas nervosa pelo interrogatorio";
         adrenalina_violet.options[1] = "A tensao pode indicar esforco fisico recente, compativel com o crime";
@@ -2340,12 +2344,7 @@ void createClues(TabelaHash &table){
         Clue vinho_unhas;
         vinho_unhas.idClue = 25;
         vinho_unhas.title = "Vinho e Sangue nas Unhas de Violet";
-        vinho_unhas.description = "Watson notou pequenas crostas arroxeadas sob as unhas "
-                                   "polidas de Violet, alem de uma sutil mancha escura "
-                                   "na barra interna de sua manga de seda. O cheiro de "
-                                   "lavanda em suas maos nao consegue mascarar o odor "
-                                   "denso e fermentado de uva. Isso a conecta diretamente "
-                                   "a cena do crime, onde vinho e sangue se misturaram.";
+        vinho_unhas.description = "Watson chamou a atencao de Holmes para as maos de Violet. O forte perfume de lavanda recende em sua pele. Bem no canto da unha de seu polegar direito e na dobra da manga de seda repousam crostas microscopicas arroxeadas, exalando um levissimo odor fermentado de uva.";
         vinho_unhas.question = "O que as crostas arroxeadas nas unhas de Violet indicam?";
         vinho_unhas.options[0] = "Ela estava pintando as unhas antes do interrogatorio";
         vinho_unhas.options[1] = "Sao residuos de tinta do bordado";
@@ -2363,11 +2362,7 @@ void createClues(TabelaHash &table){
         Clue alibi_eleanor;
         alibi_eleanor.idClue = 26;
         alibi_eleanor.title = "Alibi de Eleanor";
-        alibi_eleanor.description = "Eleanor afirma que estava em seu quarto tomando sedativos "
-                                     "para insonia. No entanto, mais tarde admitiu ter ido a cozinha "
-                                     "para roubar os antidepressivos de Edward. Ela estava na cena "
-                                     "do crime antes do assassinato. Porem, ela afirma que Raymond "
-                                     "ainda estava vivo quando ela passou por la.";
+        alibi_eleanor.description = "Eleanor afirma que estava em seu quarto tomando sedativos para insonia. No entanto, mais tarde admitiu ter ido a cozinha para roubar os antidepressivos de Edward.";
         alibi_eleanor.question = "Qual e a inconsistencia no alibi de Eleanor?";
         alibi_eleanor.options[0] = "Ela nunca esteve na cozinha";
         alibi_eleanor.options[1] = "Ela dizia estar no quarto, mas admitiu ter ido a cozinha";
@@ -2385,11 +2380,7 @@ void createClues(TabelaHash &table){
         Clue alibi_edward;
         alibi_edward.idClue = 27;
         alibi_edward.title = "Alibi de Edward";
-        alibi_edward.description = "Edward afirma que estava no jardim observando o ceu. "
-                                    "Mais tarde admitiu ter entrado na cozinha para pegar gelo. "
-                                    "Ele diz que viu que o pai nao estava la, ouviu passos "
-                                    "de mulher no corredor e fugiu de volta para o jardim. "
-                                    "Seu depoimento ajuda a estabelecer a linha do tempo.";
+        alibi_edward.description = "Edward afirma que estava no jardim observando o ceu. Mais tarde admitiu ter entrado na cozinha para pegar gelo. Ele diz que viu que o pai nao estava la, ouviu passos de mulher no corredor e fugiu de volta para o jardim.";
         alibi_edward.question = "O que o depoimento de Edward ajuda a provar?";
         alibi_edward.options[0] = "Que ele e o assassino";
         alibi_edward.options[1] = "Que uma mulher estava no corredor na hora proxima ao crime";
@@ -2407,12 +2398,7 @@ void createClues(TabelaHash &table){
         Clue alibi_violet;
         alibi_violet.idClue = 28;
         alibi_violet.title = "Alibi de Violet";
-        alibi_violet.description = "Violet afirma estar no quarto de costura no fim do corredor "
-                                    "com fones de ouvido. Este alibi e contradito por: "
-                                    "(1) Edward e Alfred ouviram passos de mulher no corredor; "
-                                    "(2) Violet tem vinho nas unhas e cheiro de lavanda, "
-                                    "conectando-a a cena do crime; "
-                                    "(3) Sua calma e ausencia de luto genuino.";
+        alibi_violet.description = "Violet afirma estar no quarto de costura no fim do corredor com fones de ouvido.";
         alibi_violet.question = "O alibi de Violet e confiavel?";
         alibi_violet.options[0] = "Sim, ela tem uma testemunha ocular";
         alibi_violet.options[1] = "Nao - multiplas evidencias a contradizem";
@@ -2430,13 +2416,7 @@ void createClues(TabelaHash &table){
         Clue tirano_domestico;
         tirano_domestico.idClue = 29;
         tirano_domestico.title = "'Tirano Domestico'";
-        tirano_domestico.description = "Quando confrontada sobre as microfissuras na faca, Violet "
-                                        "revelou sua verdadeira opiniao sobre o pai: 'Meu pai era um "
-                                        "tirano domestico, detetive Holmes. Ele esmagava a individualidade "
-                                        "de todos nesta casa. Arthur virou um ganancioso previsivel, "
-                                        "Edward um feixe de nervos ansioso e minha mae uma dependente "
-                                        "de remedios.' Isso contradiz sua afirmacao anterior de que "
-                                        "a relacao com o pai era 'maravilhosa'.";
+        tirano_domestico.description = "Quando confrontada sobre as microfissuras na faca, Violet revelou sua verdadeira opiniao sobre o pai: 'Meu pai era um tirano domestico, detetive Holmes. Ele esmagava a individualidade de todos nesta casa. Arthur virou um ganancioso previsivel, Edward um feixe de nervos ansioso e minha mae uma dependente de remedios.'";
         tirano_domestico.question = "Qual e a contradicao nas declaracoes de Violet sobre o pai?";
         tirano_domestico.options[0] = "Nao ha contradicao nenhuma";
         tirano_domestico.options[1] = "Ela disse que a relacao era maravilhosa, mas depois chamou o pai de tirano domestico";
@@ -2454,12 +2434,7 @@ void createClues(TabelaHash &table){
         Clue karma_violet;
         karma_violet.idClue = 30;
         karma_violet.title = "'Foi Apenas o Karma Dele'";
-        karma_violet.description = "Violet disse a Sherlock: 'E uma dor imensa que sinto, "
-                                    "mas ele nao era uma pessoa boa, acho que isso foi apenas "
-                                    "o karma dele.' Esta frase revela que, apesar de afirmar "
-                                    "estar triste, ela racionaliza o assassinato como algo "
-                                    "merecido. Nao ha indignacao contra o assassino - "
-                                    "ha aceitacao do destino do pai.";
+        karma_violet.description = "Violet disse a Sherlock: 'E uma dor imensa que sinto, mas ele nao era uma pessoa boa, acho que isso foi apenas o karma dele.'";
         karma_violet.question = "O que a frase 'foi apenas o karma dele' revela sobre Violet?";
         karma_violet.options[0] = "Ela acredita em religioes orientais";
         karma_violet.options[1] = "Ela sente raiva do assassino e quer justica";
@@ -2550,8 +2525,8 @@ int main() {
   createClues(table);
   createConnectionsClue(gInvestigation);
   
-  //introStory();
-  //crimeScene();
+  // introStory();
+  // crimeScene();
   interrogationScene(table, gInvestigation, inventory, totalClues, realCluesSolved);
   menuManager(table, gInvestigation, inventory, totalClues, realCluesSolved);
 
