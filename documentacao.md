@@ -63,6 +63,19 @@ Este projeto é um jogo de investigação policial em C++ que utiliza estruturas
 
 ---
 
+## NoArvore
+
+* **Descrição:** Estrutura utilizada para os nós da árvore de decisão no dossiê de acusação.
+
+| Campo      | Tipo       | Descrição                                 |
+| ---------- | ---------- | ----------------------------------------- |
+| question   | string     | Pergunta ou constatação da etapa atual    |
+| suspect    | string     | Nome do suspeito acusado na folha (se houver)|
+| esquerda   | NoArvore*  | Ponteiro para decisão afirmativa (Sim)    |
+| direita    | NoArvore*  | Ponteiro para decisão negativa (Não)      |
+
+---
+
 # Classes
 
 ## TabelaHash
@@ -129,6 +142,60 @@ Classe responsável pelo armazenamento e gerenciamento das pistas.
 
 ---
 
+## Arvore
+
+Classe responsável por gerenciar a árvore de decisão do dossiê final de acusação.
+
+---
+
+### Métodos Privados
+
+#### temProva(int idBuscado)
+
+* **Descrição:** Verifica se uma prova específica (pelo seu ID) foi adicionada ao dossiê.
+* **Parâmetros:** `idBuscado` — inteiro representando o ID da pista.
+* **Retorno:** Booleano indicando se a prova existe no dossiê.
+
+---
+
+### Métodos Públicos
+
+#### Arvore()
+
+* **Descrição:** Inicializa a árvore, definindo a raiz como nula e a contagem de evidências como 0.
+* **Parâmetros:** Nenhum.
+* **Retorno:** Nenhum.
+
+---
+
+#### criarArvore(TabelaHash &table)
+
+* **Descrição:** Constrói estaticamente a árvore de possibilidades lógicas da acusação com base nas pistas (coletadas ou não).
+* **Parâmetros:** `&table` — Referência para a tabela hash de pistas.
+* **Retorno:** Nenhum.
+
+---
+
+#### montarDossie(Clue inventory[], int totalClues)
+
+* **Descrição:** Interface interativa para o jogador selecionar entre 8 e 10 provas do inventário para o dossiê final.
+* **Parâmetros:**
+  * `inventory[]`: O array que armazena as pistas do inventário.
+  * `totalClues`: O número total de pistas no inventário.
+* **Retorno:** Nenhum.
+
+---
+
+#### iniciarAcusacao(Clue inventory[], int totalClues)
+
+* **Descrição:** Inicia o fluxo de acusação baseado nas perguntas da árvore, direcionando o jogador para o final correto ou falha na dedução.
+* **Parâmetros:**
+  * `inventory[]`: O array que armazena as pistas do inventário.
+  * `totalClues`: O número total de pistas no inventário.
+* **Retorno:** Nenhum.
+
+---
+
 ## Grafo
 
 Classe responsável pela representação lógica das conexões entre pistas.
@@ -158,14 +225,13 @@ O grafo é utilizado para exibir a linha de raciocínio investigativa de Sherloc
 
 ---
 
-#### addNo(string idClue, int nivel)
+#### addConnections(int v1, int v2)
 
-* **Descrição:** Cria e adiciona um novo nó ao grafo.
+* **Descrição:** Adiciona uma conexão (aresta) entre dois vértices do grafo.
 * **Parâmetros:**
-
-  * `idClue` — identificador da pista.
-  * `nivel` — nível investigativo da pista.
-* **Retorno:** Ponteiro para o nó criado.
+  * `v1` — índice do vértice de origem.
+  * `v2` — índice do vértice de destino.
+* **Retorno:** Nenhum.
 
 ---
 
@@ -189,12 +255,33 @@ O grafo é utilizado para exibir a linha de raciocínio investigativa de Sherloc
 
 ---
 
-#### showReasoningLine(string clueKey)
+#### showReasoningLine(string clueKey, TabelaHash &table)
 
 * **Descrição:** Exibe visualmente a linha de raciocínio das pistas conectadas.
 * **Parâmetros:** 
   * `clueKey` — identificador da pista.
   * `&table`: Referência para a tabela hash de pistas.
+* **Retorno:** Nenhum.
+
+---
+
+#### printDFS(int nodeIdx, TabelaHash &table, bool visited[], string prefix, bool isLast)
+
+* **Descrição:** Imprime a árvore de conexões em profundidade no terminal, auxiliando a visualização gráfica do palácio mental.
+* **Parâmetros:**
+  * `nodeIdx`: índice atual do vértice.
+  * `&table`: Referência para a tabela hash.
+  * `visited[]`: Array de nós visitados.
+  * `prefix`: String de prefixo para formatação de níveis (hierarquia visual).
+  * `isLast`: Booleano indicando se é o último nó de uma ramificação.
+* **Retorno:** Nenhum.
+
+---
+
+#### showMentalWeb(TabelaHash &table)
+
+* **Descrição:** Exibe o palácio mental completo, estruturando e formatando todas as conexões do grafo como árvores dependentes e nós circulares/isolados.
+* **Parâmetros:** `&table` — Referência para a tabela hash de pistas.
 * **Retorno:** Nenhum.
 
 ---
@@ -254,7 +341,7 @@ O grafo é utilizado para exibir a linha de raciocínio investigativa de Sherloc
   * `&realCluesSolved`: Referência para o contador de pistas principais resolvidas.
 * **Retorno:** Nenhum.
 
-#### showDeduction(Grafo &graph, string clueKey)
+#### showDeduction(Grafo &graph, TabelaHash &table, string clueKey)
 * **Descrição:** Exibe a linha de raciocínio de Holmes, mostrando a conexão visual no grafo e uma dedução textual associada à pista resolvida.
 * **Parâmetros:**
   * `&graph`: Referência para o grafo de investigação.
@@ -374,9 +461,15 @@ Início
 
 # Funções Auxiliares
 
-## next()
+## limparTela()
 
-* **Descrição:** Cria pausas entre diálogos e cenas.
+* **Descrição:** Limpa a tela do console utilizando comandos nativos dependentes do sistema operacional (Windows/Unix).
+
+---
+
+## pausa()
+
+* **Descrição:** Cria pausas para leitura do jogador entre diálogos e cenas, exigindo que a tecla Enter seja pressionada.
 
 ---
 
@@ -422,9 +515,9 @@ Início
 * **Retorno:** Nenhum.
 
 #### Funções de Interrogatório
-* `eleanorInterrogation()`, `arthurInterrogation()`, `edwardInterrogation()`, `violetInterrogation()`, `alfredInterrogation()`
-* **Descrição:** Cada uma dessas funções é responsável por gerenciar o diálogo e as perguntas para um suspeito específico.
-* **Parâmetros:** Nenhum.
+* `eleanorInterrogation(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalClues, int &realCluesSolved)`
+* `arthurInterrogation(...)`, `edwardInterrogation(...)`, `violetInterrogation(...)`, `alfredInterrogation(...)`
+* **Descrição:** Cada uma dessas funções é responsável por gerenciar o diálogo e as perguntas para um suspeito específico. Todas recebem as estruturas principais do jogo por referência, além do inventário.
 * **Retorno:** Nenhum.
 
 ---
@@ -445,14 +538,18 @@ Início
 
 # Final do Jogo
 
-#### accusationMenu()
-* **Descrição:** Função chamada quando o jogador decide fazer uma acusação. Verifica se a escolha do jogador está correta e direciona para o final correspondente.
-* **Parâmetros:** Nenhum.
+#### iniciarAcusacao(Clue inventory[], int totalClues)
+* *(Nota: A integração com o sistema principal ocorre através das chamadas feitas na classe `Arvore`)*
+* **Descrição:** Inicia a sequência de dedução utilizando as provas selecionadas no dossiê. É o ponto culminante do sistema de dedução final.
+
+#### wrongEnding(string suspect, Clue inventory[], int &totalClues)
+* **Descrição:** Exibe uma narrativa de acusação falha para um suspeito incorreto e permite voltar ao jogo.
+* **Parâmetros:** `suspect` (nome do suspeito acusado), array do inventário, total de pistas.
 * **Retorno:** Nenhum.
 
-#### bestEnding()
-* **Descrição:** Exibe a narrativa do final verdadeiro, onde Sherlock revela o assassino e suas motivações.
-* **Parâmetros:** Nenhum.
+#### bestEnding(Clue inventory[], int &totalClues)
+* **Descrição:** Exibe a narrativa do final verdadeiro, onde Sherlock revela o assassino (Violet) e suas motivações precisas baseando-se nas provas.
+* **Parâmetros:** Array do inventário de pistas, referência para a contagem.
 * **Retorno:** Nenhum.
 
 ---

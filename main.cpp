@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>    // SetConsoleOutputCP
@@ -74,10 +75,12 @@ class TabelaHash{
 
   public:
     TabelaHash() {
-      for (int i = 0; i < MAX; i++) {
+      for(int i = 0; i < MAX; i++) {
         tableHash[i] = NULL;
       }
     }
+
+
 
     void input(string key, Clue value) {
       int position = funcaoHash(key);
@@ -209,6 +212,8 @@ class Grafo{
         vertices[i] = NULL;
       }
     }
+
+
     No* addNo(string idClue, int nivel){ //Criacao do no(Niveis)
 
       No* newNo = new No;
@@ -1706,27 +1711,56 @@ void interrogationScene(TabelaHash &table, Grafo &graph, Clue inventory[], int &
 
 // ---------------[Final Errado]---------------
 void wrongEnding(string suspect, Clue inventory[], int &totalClues){
-  cout << "Sherlock reunia todos." << endl;
+  cout << "Sherlock convoca toda a familia Whitmore a sala de estar." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
   limparTela();
 
-  cout << "E explica com base nas suas provas:" << endl;
+  cout << "Com uma postura irredutivel, ele apresenta as pecas do seu dossie:" << endl;
   for(int i = 0; i < totalClues; i++){
     if(inventory[i].descoberta){
       cout << "- " << inventory[i].title << endl;
     }
   }
+  
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
+  limparTela();
+  
+  cout << "Holmes aponta o dedo para " << suspect << " e declara sua culpa perante os policiais!" << endl;
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
+  
+  if(suspect == "Arthur") {
+      cout << "Arthur debate-se enquanto os policiais o algemam: 'Voce e patetico, detetive. Isso e circunstancial! Eu sou inocente!'" << endl;
+  } else if (suspect == "Eleanor") {
+      cout << "Eleanor desaba em lagrimas enquanto os guardas a puxam: 'Eu o odiava pelo que ele se tornou, mas eu nunca faria isso!'" << endl;
+  } else if (suspect == "Edward") {
+      cout << "Edward entra em panico total enquanto a policia o leva: 'Isso foi plantado! Voces estao armando para mim! Eu estava no jardim!'" << endl;
+  } else if (suspect == "Alfred") {
+      cout << "Alfred se deixa algemar de forma estoica: 'Um erro tragico de julgamento da sua parte, senhor. Minhas maos estao limpas.'" << endl;
+  }
+  
+  cout << "\nPara prosseguir aperte Enter..." << endl;
+  pausa();
+  
+  cout << suspect << " e levado(a) pela policia e o caso e dado como encerrado pelas autoridades." << endl;
+  cout << "Porem, a mente de Sherlock percebe o erro tarde demais." << endl;
+  cout << "O verdadeiro assassino sorri nas sombras da mansao, agora livre de qualquer suspeita para sempre." << endl;
+  cout << "\n===== GAME OVER (FINAL RUIM) =====" << endl;
+  cin.ignore();
+  exit(0);
 }
 
 // ---------------[Final Certo]---------------
 void bestEnding(Clue inventory[], int &totalClues){
-  cout << "Sherlock reunia todos." << endl;
+  cin.ignore();
+  cout << "Sherlock convoca toda a familia Whitmore a sala de estar." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
   limparTela();
 
-  cout << "E explica com base nas suas provas:" << endl;
+  cout << "Com uma precisao cirurgica, ele derruba as mentiras de todos e isola as provas do seu dossie:" << endl;
   for(int i = 0; i < totalClues; i++){
     if(inventory[i].descoberta){
       cout << "- " << inventory[i].title << endl;
@@ -1734,53 +1768,36 @@ void bestEnding(Clue inventory[], int &totalClues){
   }  
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
+  limparTela();
 
-  cout << "Entao Holmes encara Violet." << endl;
+  cout << "Entao, sob o choque de Eleanor e o desespero de Edward..." << endl;
+  cout << "Holmes caminha lentamente e encara Violet." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
-  cout << "E ela..." << endl;
+  cout << "A garota silencia a sala com um olhar gelido. Seu rosto angelical nao demonstra choque, muito menos medo." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
-  cout << "sorri." << endl;
+  cout << "E entao... ela sorri." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
-  cout << "Nao porque foi pega." << endl;
+  cout << "Nao porque foi pega de surpresa. Nao porque sente remorso pelo que fez ao pai." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
   cout << "Mas porque:" << endl;
-  cout << "finalmente encontrou alguem capaz de entende-la." << endl;
+  cout << "Finalmente, apos tantos anos apodrecendo na sombra daquele tirano, ela encontrou um intelecto capaz de compreender a beleza da sua obra." << endl;
   cout << "\nPara prosseguir aperte Enter..." << endl;
   pausa();
 
-  cout << endl << "===== FIM =====" << endl;
+  cout << "\nViolet estende as delicadas maos, ainda ocultando pequenos vestigios escarlates sob as unhas, pronta para as algemas." << endl;
+  cout << "O Karma havia sido cobrado. O maior caso de Sherlock Holmes esta encerrado." << endl;
+  cout << "\n===== FIM (FINAL VERDADEIRO) =====" << endl;
+  pausa();
+  exit(0);
 };
-
-// Substituido
-//---------------[Menus Acusacoes]---------------
-// void accusationMenu(){ //Cena de acusacao
-//   int opt = 0;
-//   limparTela();
-
-//   cout << "\nQuem e o assassino?\n"; 
-//   cout << "1 - Eleanor\n2 - Arthur\n3 - Edward\n4 - Violet\n5 - Alfred\n";
-
-//   cin >> opt;
-
-//   if(opt == 4){
-//     cout << "\nSherlock observa Violet em silencio...\n";
-//     cout << "Ela sorri.\n";
-    
-//     //bestEnding();
-//   }
-//   else{
-//     cout << "\nHolmes fecha os olhos.\n";
-//     cout << "A acusacao nao se sustenta.\n";
-//   }
-// }
 
 //---------------[Menu Cozinha]---------------
 void kitchenMenu(TabelaHash &table, Grafo &graph,Clue inventory[], int &totalClues, int &realCluesSolved){ //Menu da cena da cozinha
@@ -1960,6 +1977,27 @@ class Arvore{
       evidenceCount = 0;
     }
 
+#ifdef UNIT_TEST
+    void injectDossier(Clue dossier[], int count) {
+        for(int i=0; i<count; i++) selectedEvidence[i] = dossier[i];
+        evidenceCount = count;
+    }
+
+    string simulateTraversal(vector<int> respostas) {
+        NoArvore* atual = raiz;
+        int resIdx = 0;
+        while(atual != NULL){
+            if(atual->suspect != "") return atual->suspect;
+            if(resIdx >= respostas.size()) return "OUT_OF_RESPONSES";
+            int op = respostas[resIdx++];
+            if(op == 1) atual = atual->esquerda;
+            else if(op == 2) atual = atual->direita;
+            else return "INVALID";
+        }
+        return "NULL_NODE";
+    }
+#endif
+
     void criarArvore(TabelaHash &table){
       if(raiz != NULL) return;
       raiz = new NoArvore;
@@ -2007,22 +2045,22 @@ class Arvore{
       }
 
       if(faca.optionChosen == 0 || angulo.optionChosen != 2) {
-          raiz->question = "O ataque parece calculista. A fortuna do testamento foi a verdadeira motivacao do crime? (1-Sim/2-Nao)";
+          raiz->question = "O ataque parece calculista. A fortuna do testamento foi a verdadeira motivacao do crime?";
           raiz->esquerda = new NoArvore; 
           raiz->direita = new NoArvore;
 
           if(temProva(10) && discussao.optionChosen == 1 && temProva(31) && tensao.optionChosen == 1 && temProva(32) && alibi_ar.optionChosen == 1) {
-              raiz->esquerda->question = "Arthur tem motivos e furia retida. Foi ele quem encomendou a morte do pai? (1-Sim/2-Nao)";
+              raiz->esquerda->question = "Arthur tem motivos e furia retida. Foi ele quem encomendou a morte do pai?";
               raiz->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->suspect = "Arthur";
               raiz->esquerda->direita = new NoArvore; raiz->esquerda->direita->suspect = "Inconclusivo";
           } else {
-              raiz->esquerda->question = "Descartando Arthur, a viuva Eleanor seria a mandante do crime para garantir a heranca? (1-Sim/2-Nao)";
+              raiz->esquerda->question = "Descartando Arthur, a viuva Eleanor seria a mandante do crime para garantir a heranca?";
               raiz->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->suspect = "Eleanor";
               raiz->esquerda->direita = new NoArvore; raiz->esquerda->direita->suspect = "Inconclusivo";
           }
 
           if(temProva(19) && invisivel.optionChosen == 1 && temProva(34) && alibi_al.optionChosen == 1 && fisico_al.optionChosen != 2) {
-              raiz->direita->question = "O mordomo Alfred cometeu o crime por decadas de humilhacao e odio de classe? (1-Sim/2-Nao)";
+              raiz->direita->question = "O mordomo Alfred cometeu o crime por decadas de humilhacao e odio de classe?";
               raiz->direita->esquerda = new NoArvore; raiz->direita->esquerda->suspect = "Alfred";
               raiz->direita->direita = new NoArvore; raiz->direita->direita->suspect = "Inconclusivo";
           } else {
@@ -2032,12 +2070,12 @@ class Arvore{
           }
       } 
       else {
-          raiz->question = "O ataque foi caotico e passional. O assassino forjou a cena para enganar a policia? (1-Sim/2-Nao)";
+          raiz->question = "O ataque foi caotico e passional. O assassino forjou a cena para enganar a policia?";
           raiz->esquerda = new NoArvore; 
           raiz->direita = new NoArvore;
 
           if(temProva(9) && cigarro.optionChosen == 2 && temProva(11) && frasco.optionChosen == 2) { 
-              raiz->direita->question = "As bitucas e remedios apontam para Edward. Ele teve um surto e atacou o pai? (1-Sim/2-Nao)";
+              raiz->direita->question = "As bitucas e remedios apontam para Edward. Ele teve um surto e atacou o pai?";
               if(!temProva(16) || cinzeiro.optionChosen != 2) { 
                   raiz->direita->esquerda = new NoArvore; raiz->direita->esquerda->suspect = "Edward";
                   raiz->direita->direita = new NoArvore; raiz->direita->direita->suspect = "Inconclusivo";
@@ -2053,12 +2091,12 @@ class Arvore{
           }
 
           if(temProva(7) && lavanda.optionChosen == 1 && temProva(13) && passos.optionChosen == 2) { 
-              raiz->esquerda->question = "As pistas apontam para as mulheres da casa. A motivacao seria ciume por traicao? (1-Sim/2-Nao)";
+              raiz->esquerda->question = "As pistas apontam para as mulheres da casa. A motivacao seria ciume por traicao?";
               raiz->esquerda->esquerda = new NoArvore; 
               raiz->esquerda->direita = new NoArvore;
 
               if(temProva(12) && traicao.optionChosen == 1 && temProva(17) && sintomas.optionChosen == 1) {
-                  raiz->esquerda->esquerda->question = "Eleanor mentiu o alibi e abusa de sedativos. Ela atacou o marido por ciume? (1-Sim/2-Nao)";
+                  raiz->esquerda->esquerda->question = "Eleanor mentiu o alibi e abusa de sedativos. Ela atacou o marido por ciume?";
                   raiz->esquerda->esquerda->esquerda = new NoArvore; raiz->esquerda->esquerda->esquerda->suspect = "Eleanor";
                   raiz->esquerda->esquerda->direita = new NoArvore; raiz->esquerda->esquerda->direita->suspect = "Inconclusivo";
               } else {
@@ -2067,12 +2105,12 @@ class Arvore{
                   raiz->esquerda->esquerda->direita = new NoArvore; raiz->esquerda->esquerda->direita->suspect = "Inconclusivo";
               }
 
-              raiz->esquerda->direita->question = "Restando apenas o odio familiar, Violet forjou friamente o seu alibi usando os fones? (1-Sim/2-Nao)";
+              raiz->esquerda->direita->question = "Restando apenas o odio familiar, Violet forjou friamente o seu alibi usando os fones?";
               raiz->esquerda->direita->esquerda = new NoArvore;
               raiz->esquerda->direita->direita = new NoArvore;
 
-              if(temProva(22) && frieza.optionChosen == 2 && temProva(23) && perdeu_medo.optionChosen == 2 && temProva(24) && adrenalina.optionChosen == 1 && temProva(29) && tirano.optionChosen != -1 && temProva(30) && karma.optionChosen == 2 && temProva(28) && alibi_vi.optionChosen == 1 && temProva(21) && fones.optionChosen == 1) {
-                  raiz->esquerda->direita->esquerda->question = "Violet e a suspeita final. Existe prova fisica no dossie que a conecte ao sangue? (1-Sim/2-Nao)";
+              if(frieza.optionChosen == 2 && perdeu_medo.optionChosen == 2 && adrenalina.optionChosen == 1 && tirano.optionChosen != -1 && karma.optionChosen == 2 && alibi_vi.optionChosen == 1 && temProva(21) && fones.optionChosen == 1) {
+                  raiz->esquerda->direita->esquerda->question = "Violet e a suspeita final. Existe prova fisica no dossie que a conecte ao sangue?";
                   
                   raiz->esquerda->direita->esquerda->esquerda = new NoArvore;
                   raiz->esquerda->direita->esquerda->direita = new NoArvore;
@@ -2167,8 +2205,20 @@ class Arvore{
           else if(suspect == "Arthur"){wrongEnding(atual->suspect, selectedEvidence, evidenceCount);}
           else if(suspect == "Edward"){wrongEnding(atual->suspect, selectedEvidence, evidenceCount);}
           else{
-            cout<< "Acusacao inconclusiva. Nao foi possivel identificar o assassino." << endl;
-            pausa();
+            cout << "\n[Falha na Deducao] Acusacao inconclusiva. As provas ou sua logica falharam." << endl;
+            cout << "Deseja tentar responder novamente usando este MESMO Dossie?" << endl;
+            cout << "1. Sim, recomecar do inicio da arvore" << endl;
+            cout << "2. Nao, reabrir inventario/menu" << endl;
+            cout << "Opcao: ";
+            int tentar;
+            cin >> tentar;
+            cin.ignore();
+            
+            if(tentar == 1) {
+                atual = raiz; 
+                limparTela();
+                continue; 
+            }
           }
           break;
         }
@@ -2255,6 +2305,7 @@ void menuManager(TabelaHash &table, Grafo &graph, Clue inventory[], int &totalCl
           if(!c.descoberta && c.idClue != 0) {
             c.descoberta = true;
             c.resolvida = true; 
+            c.optionChosen = c.correctReponse; // <--- O Cheat agora responde corretamente!
             table.input(keys[i], c);
             inventory[totalClues] = c;
             totalClues++;
@@ -2470,7 +2521,7 @@ void createClues(TabelaHash &table){
         discussao_arthur.options[1] = "Arthur foi excluido da linha de sucessao das empresas";
         discussao_arthur.options[2] = "Arthur queria vender a mansao da familia";
         discussao_arthur.options[3] = "Arthur se recusou a trabalhar na empresa";
-        discussao_arthur.correctReponse = -1;
+        discussao_arthur.correctReponse = 1;
         discussao_arthur.resolvida = false;
         discussao_arthur.descoberta = false;
         discussao_arthur.realClue = false;
@@ -2506,7 +2557,7 @@ void createClues(TabelaHash &table){
         suspeita_traicao.options[1] = "Ela suspeitava que Raymond a traia - motivo passional";
         suspeita_traicao.options[2] = "Ela foi chantageada por Arthur";
         suspeita_traicao.options[3] = "Ela nao tinha motivo algum";
-        suspeita_traicao.correctReponse = -1;
+        suspeita_traicao.correctReponse = 1;
         suspeita_traicao.resolvida = false;
         suspeita_traicao.descoberta = false;
         suspeita_traicao.realClue = false;
@@ -2821,7 +2872,7 @@ void createClues(TabelaHash &table){
         tirano_domestico.options[1] = "Ela disse que a relacao era maravilhosa, mas depois chamou o pai de tirano domestico";
         tirano_domestico.options[2] = "Ela nunca falou sobre o pai";
         tirano_domestico.options[3] = "Ela sempre odiou o pai abertamente";
-        tirano_domestico.correctReponse = -1;
+        tirano_domestico.correctReponse = 1;
         tirano_domestico.resolvida = false;
         tirano_domestico.descoberta = false;
         tirano_domestico.realClue = true;
@@ -2996,6 +3047,7 @@ void createConnectionsClue(Grafo &graph) {
 
 
 //---------------[Main]---------------
+#ifndef UNIT_TEST
 int main() {
   TabelaHash table;
 
@@ -3009,8 +3061,8 @@ int main() {
   createClues(table);
   createConnectionsClue(gInvestigation);
   
-  // introStory();
-  // crimeScene();
+  introStory();
+  crimeScene();
   interrogationScene(table, gInvestigation, inventory, totalClues, realCluesSolved);
   menuManager(table, gInvestigation, inventory, totalClues, realCluesSolved);
 
@@ -3018,3 +3070,4 @@ int main() {
 
   return 0;
 }
+#endif
